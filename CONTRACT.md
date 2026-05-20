@@ -45,9 +45,9 @@ Content-Type: application/json
 
 ---
 
-## 2. `GET /v1/content/hero` — fetch hero text
+## 2. `GET /v1/content/hero` — fetch editable hero content
 
-Returns the 3 hero phrases. Short-cached at the edge (60s).
+Returns the editable hero subhead. No edge cache — admin edits reflect on the very next request.
 
 ### Request
 
@@ -59,19 +59,17 @@ GET https://api.greatidea-cs.com/v1/content/hero
 
 ```json
 {
-  "phrase1": "Creative Services · Tech that fits",
-  "phrase2": "Your great idea, built right.",
-  "phrase3": "We design websites, apps, and the quiet systems that run your business — so you can spend your time on the part only you can do."
+  "subhead": "Custom AI solutions powered by Claude for creative projects, business workflows, and digital innovation. From intelligent automation to cutting-edge interactive experiences."
 }
 ```
 
-`phrase1`, `phrase2`, `phrase3` are intentionally generic. Map them to whatever the design calls for — typically eyebrow / headline / subhead. If KV has no stored value, the API returns a fallback.
+Currently only the subhead is API-driven. The hero headline + cycling rotation are owned by Make (hardcoded in the component). If KV has no stored value, the API returns a fallback.
 
 ---
 
-## 3. `PATCH /v1/content/hero` — update hero text (admin)
+## 3. `PATCH /v1/content/hero` — update hero subhead (admin)
 
-Updates the hero copy in KV. Partial updates allowed (send only the fields you want to change).
+Updates the subhead in KV. Partial updates allowed.
 
 ### Request
 
@@ -81,7 +79,7 @@ Authorization: Bearer <ADMIN_TOKEN>
 Content-Type: application/json
 
 {
-  "phrase2": "Your idea. Built faster than you'd think."
+  "subhead": "New subhead text here."
 }
 ```
 
@@ -89,7 +87,7 @@ Content-Type: application/json
 
 | Status | Body |
 |---|---|
-| `200` | `{ "ok": true, "hero": { "phrase1": "...", "phrase2": "...", "phrase3": "..." } }` |
+| `200` | `{ "ok": true, "hero": { "subhead": "..." } }` |
 | `400` | `{ "ok": false, "errors": { "<field>": "<msg>" } }` |
 | `401` | `{ "ok": false, "error": "unauthorized" }` |
 
@@ -99,7 +97,7 @@ Content-Type: application/json
 curl -X PATCH https://api.greatidea-cs.com/v1/content/hero \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"phrase2":"Your idea. Built faster than you'\''d think."}'
+  -d '{"subhead":"New subhead text here."}'
 ```
 
 ---
