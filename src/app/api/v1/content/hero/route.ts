@@ -8,17 +8,17 @@ export const runtime = "nodejs";
 const KEY = "content:hero";
 
 /**
- * Editable hero content. Currently the API only controls the subhead paragraph.
+ * Editable hero content. Currently the API only controls the subheader paragraph.
  * The hero headline + cycling animation are owned by Make (hardcoded in their
  * component). Add more fields here as the editing surface grows.
  */
 const FALLBACK = {
-  subhead:
+  subheader:
     "Custom AI solutions powered by Claude for creative projects, business workflows, and digital innovation. From intelligent automation to cutting-edge interactive experiences.",
 };
 
 const HeroSchema = z.object({
-  subhead: z.string().trim().min(1).max(500),
+  subheader: z.string().trim().min(1).max(500),
 });
 
 type Hero = z.infer<typeof HeroSchema>;
