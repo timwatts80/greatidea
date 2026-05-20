@@ -101,17 +101,59 @@ export async function POST(req: Request) {
     }),
   ]);
 
-  // Notification email is the only hard requirement. If it failed, tell the client.
-  if (notify.status === "rejected") {
-    console.error("notify email failed:", notify.reason);
-    return json(req, { ok: false, error: "email_failed" }, { status: 502 });
+  // Resend's SDK returns errors two ways:
+  //   1. SDK-level rejection (network, auth) → Promise rejected
+  //   2. API-level error (unverified domain, bad from address) → Promise fulfilled with { error }
+  // Treat both as failure for the notification email.
+  const notifyError = extractResendError(notify);
+  if (notifyError) {
+    console.error("notify email failed:", notifyError);
+    return json(req, {
+      ok: false,
+      error: "email_failed",
+      // Surface the actual reason in non-production for easier diagnosis.
+      ...(env.NODE_ENV !== "production" ? { detail: notifyError } : {}),
+    }, { status: 502 });
   }
 
-  if (confirm.status === "rejected") console.error("confirm email failed:", confirm.reason);
-  if (crmResult.status === "rejected") console.error("notion write failed:", crmResult.reason);
+  const confirmError = extractResendError(confirm);
+  if (confirmError) console.error("confirm email failed:", confirmError);
+  if (crmResult.status === "rejected") {
+    console.error("notion write failed:", String(crmResult.reason), crmResult.reason);
+  }
 
-  return json(req, {
-    ok: true,
-    id: notify.status === "fulfilled" ? notify.value.data?.id : null,
-  });
+  const notifyId =
+    notify.status === "fulfilled" && notify.value && "data" in notify.value
+      ? notify.value.data?.id ?? null
+      : null;
+
+  return json(req, { ok: true, id: notifyId });
+}
+
+/**
+ * Pull a structured error out of a Promise.allSettled result for resend.emails.send().
+ * Returns null if the send succeeded.
+ */
+function extractResendError(
+  settled: PromiseSettledResult<unknown>,
+): { name?: string; message?: string; statusCode?: number; raw: string } | null {
+  if (settled.status === "rejected") {
+    const r = settled.reason as { name?: string; message?: string; statusCode?: number } | undefined;
+    return {
+      name: r?.name,
+      message: r?.message,
+      statusCode: r?.statusCode,
+      raw: String(settled.reason),
+    };
+  }
+  const value = settled.value as { error?: { name?: string; message?: string; statusCode?: number } | null } | null;
+  if (value && value.error) {
+    return {
+      name: value.error.name,
+      message: value.error.message,
+      statusCode: value.error.statusCode,
+      raw: JSON.stringify(value.error),
+    };
+  }
+  return null;
 }
