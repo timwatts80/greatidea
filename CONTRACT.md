@@ -47,7 +47,7 @@ Content-Type: application/json
 
 ## 2. `GET /v1/content/hero` — fetch editable hero content
 
-Returns the editable hero subhead. No edge cache — admin edits reflect on the very next request.
+Returns the editable hero subheader. No edge cache — admin edits reflect on the very next request.
 
 ### Request
 
@@ -59,17 +59,17 @@ GET https://api.greatidea-cs.com/v1/content/hero
 
 ```json
 {
-  "subhead": "Custom AI solutions powered by Claude for creative projects, business workflows, and digital innovation. From intelligent automation to cutting-edge interactive experiences."
+  "subheader": "Custom AI solutions powered by Claude for creative projects, business workflows, and digital innovation. From intelligent automation to cutting-edge interactive experiences."
 }
 ```
 
-Currently only the subhead is API-driven. The hero headline + cycling rotation are owned by Make (hardcoded in the component). If KV has no stored value, the API returns a fallback.
+Currently only the subheader is API-driven. The hero headline + cycling rotation are owned by Make (hardcoded in the component). If KV has no stored value, the API returns a fallback.
 
 ---
 
-## 3. `PATCH /v1/content/hero` — update hero subhead (admin)
+## 3. `PATCH /v1/content/hero` — update hero subheader (admin)
 
-Updates the subhead in KV. Partial updates allowed.
+Updates the subheader in KV. Partial updates allowed.
 
 ### Request
 
@@ -79,7 +79,7 @@ Authorization: Bearer <ADMIN_TOKEN>
 Content-Type: application/json
 
 {
-  "subhead": "New subhead text here."
+  "subheader": "New subheader text here."
 }
 ```
 
@@ -87,7 +87,7 @@ Content-Type: application/json
 
 | Status | Body |
 |---|---|
-| `200` | `{ "ok": true, "hero": { "subhead": "..." } }` |
+| `200` | `{ "ok": true, "hero": { "subheader": "..." } }` |
 | `400` | `{ "ok": false, "errors": { "<field>": "<msg>" } }` |
 | `401` | `{ "ok": false, "error": "unauthorized" }` |
 
@@ -97,7 +97,7 @@ Content-Type: application/json
 curl -X PATCH https://api.greatidea-cs.com/v1/content/hero \
   -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"subhead":"New subhead text here."}'
+  -d '{"subheader":"New subheader text here."}'
 ```
 
 ---
@@ -140,7 +140,7 @@ Update the placeholders (`TURNSTILE_SITE_KEY`) before pasting.
 
 ## Prompt B — make the hero phrases API-driven
 
-> Update the hero section so its 3 text phrases (eyebrow / headline / subhead, or whatever the design calls for) are fetched at render time from `https://api.greatidea-cs.com/v1/content/hero`.
+> Update the hero section so its 3 text phrases (eyebrow / headline / subheader, or whatever the design calls for) are fetched at render time from `https://api.greatidea-cs.com/v1/content/hero`.
 >
 > Response shape:
 > ```json
@@ -150,7 +150,7 @@ Update the placeholders (`TURNSTILE_SITE_KEY`) before pasting.
 > Mapping for the current design:
 > - **phrase1** → the small eyebrow label above the main headline
 > - **phrase2** → the main hero headline
-> - **phrase3** → the subhead paragraph beneath the headline
+> - **phrase3** → the subheader paragraph beneath the headline
 >
 > Behavior:
 > - On mount, `fetch` the endpoint and render each phrase in its slot.
@@ -174,7 +174,7 @@ Update the placeholders (`TURNSTILE_SITE_KEY`) before pasting.
 > 3. **Three text inputs** for the phrases:
 >     - Label "Phrase 1 (eyebrow)" — single-line input
 >     - Label "Phrase 2 (headline)" — single-line input
->     - Label "Phrase 3 (subhead)" — multi-line textarea (3 rows)
+>     - Label "Phrase 3 (subheader)" — multi-line textarea (3 rows)
 > 4. **Update button** — full-width, primary style.
 > 5. **Status area** below the button — empty by default; renders inline success or error messages after each submit attempt.
 >
