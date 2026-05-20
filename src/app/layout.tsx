@@ -5,26 +5,21 @@ import "./globals.css";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Great Idea Creative Services - Fast, Affordable Web Design & Development",
-  description: "We design and develop modern websites, web apps, and SEO systems that help small businesses grow. Simple process. Fair pricing. Launch-ready in weeks, not months.",
-  keywords: "web design, web development, SEO, small business websites, Utah web design, web apps",
+  title: "Great Idea CS — Bring your vision to life",
+  description:
+    "Great Idea Creative Services builds modern websites, apps, design systems, and the quiet automation that runs your business. Built with craft. Accelerated by AI.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.variable} font-sans antialiased`}
-      >
-        {children}
-      </body>
+      <body className={`${inter.variable} font-sans antialiased`}>{children}</body>
     </html>
   );
 }
