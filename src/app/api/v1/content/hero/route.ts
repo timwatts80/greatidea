@@ -8,24 +8,20 @@ export const runtime = "nodejs";
 const KEY = "content:hero";
 
 /**
- * The hero is structured as 3 named phrases. Make is free to render them
- * however the design calls for — typically:
- *   phrase1 → eyebrow / small label above the headline
- *   phrase2 → main headline
- *   phrase3 → subhead paragraph
- * The naming is intentionally generic so the API doesn't constrain layout.
+ * The hero is structured as 3 named phrases. Make currently uses them as the
+ * 3 rotating headline phrases in the hero (eyebrow + subhead are hard-coded
+ * in Make for now). Generic naming keeps the API decoupled from layout choices.
  */
 const FALLBACK = {
-  phrase1: "Creative Services · Tech that fits",
-  phrase2: "Your great idea, built right.",
-  phrase3:
-    "We design websites, apps, and the quiet systems that run your business — so you can spend your time on the part only you can do.",
+  phrase1: "Elevate Your Business with AI",
+  phrase2: "Create Your Next Innovation",
+  phrase3: "Transform Your Digital Vision",
 };
 
 const HeroSchema = z.object({
   phrase1: z.string().trim().min(1).max(200),
   phrase2: z.string().trim().min(1).max(200),
-  phrase3: z.string().trim().min(1).max(500),
+  phrase3: z.string().trim().min(1).max(200),
 });
 
 type Hero = z.infer<typeof HeroSchema>;
