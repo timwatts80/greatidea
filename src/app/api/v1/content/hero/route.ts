@@ -8,20 +8,17 @@ export const runtime = "nodejs";
 const KEY = "content:hero";
 
 /**
- * The hero is structured as 3 named phrases. Make currently uses them as the
- * 3 rotating headline phrases in the hero (eyebrow + subhead are hard-coded
- * in Make for now). Generic naming keeps the API decoupled from layout choices.
+ * Editable hero content. Currently the API only controls the subhead paragraph.
+ * The hero headline + cycling animation are owned by Make (hardcoded in their
+ * component). Add more fields here as the editing surface grows.
  */
 const FALLBACK = {
-  phrase1: "Elevate Your Business with AI",
-  phrase2: "Create Your Next Innovation",
-  phrase3: "Transform Your Digital Vision",
+  subhead:
+    "Custom AI solutions powered by Claude for creative projects, business workflows, and digital innovation. From intelligent automation to cutting-edge interactive experiences.",
 };
 
 const HeroSchema = z.object({
-  phrase1: z.string().trim().min(1).max(200),
-  phrase2: z.string().trim().min(1).max(200),
-  phrase3: z.string().trim().min(1).max(200),
+  subhead: z.string().trim().min(1).max(500),
 });
 
 type Hero = z.infer<typeof HeroSchema>;
@@ -34,8 +31,9 @@ export async function GET(req: Request) {
   const stored = (await kv().get<Hero>(KEY)) ?? FALLBACK;
   return json(req, stored, {
     headers: {
-      // Short cache: lets Make fetch fresh content reasonably often.
-      "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+      // No cache: admin edits should reflect on the very next reload.
+      // KV reads are fast enough that we don't need an edge cache here.
+      "Cache-Control": "no-store, must-revalidate",
     },
   });
 }
