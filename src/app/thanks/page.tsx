@@ -72,13 +72,24 @@ export default async function ThanksPage({
           padding: "24px 32px",
           display: "flex",
           alignItems: "center",
-          gap: 12,
         }}
       >
-        <BrandMark />
-        <span style={{ fontWeight: 600, letterSpacing: "-0.01em" }}>
-          great idea <span style={{ color: BRAND.muted }}>cs</span>
-        </span>
+        <Link
+          href="https://greatidea-cs.com"
+          aria-label="Great Idea CS home"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 12,
+            color: BRAND.text,
+            textDecoration: "none",
+          }}
+        >
+          <BrandMark />
+          <span style={{ fontWeight: 600, letterSpacing: "-0.01em" }}>
+            great idea <span style={{ color: BRAND.muted }}>cs</span>
+          </span>
+        </Link>
       </header>
 
       {/* Hero */}
@@ -159,11 +170,11 @@ export default async function ThanksPage({
               maxWidth: 520,
             }}
           >
-            Your project is officially on. We&rsquo;ll reach out within{" "}
+            Your project is officially on. I&rsquo;ll be in touch within{" "}
             <span style={{ color: BRAND.text, fontWeight: 500 }}>
               one business day
             </span>{" "}
-            to schedule the kickoff and get the ball rolling.
+            to schedule the kickoff and get rolling.
           </p>
 
           {/* Order reference card */}
@@ -225,8 +236,8 @@ export default async function ThanksPage({
               }}
             >
               <Step n={1}>You&rsquo;ll get a confirmation email with your receipt within a few minutes.</Step>
-              <Step n={2}>A real person from our team reads your intake and replies within one business day to set up a kickoff call.</Step>
-              <Step n={3}>We start shaping the work together. Most projects ship within three to six weeks.</Step>
+              <Step n={2}>On the kickoff call we&rsquo;ll walk through your idea, lock in scope, and agree on a timeline.</Step>
+              <Step n={3}>Then I&rsquo;ll start shaping the work with you. Most projects ship within three to six weeks.</Step>
             </ol>
           </div>
 
