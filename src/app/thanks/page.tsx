@@ -1,0 +1,371 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+/**
+ * Post-payment thank-you page.
+ *
+ * Stripe Checkout redirects here on success. Configure your success_url as:
+ *   https://api.greatidea-cs.com/thanks?session_id={CHECKOUT_SESSION_ID}
+ *
+ * The {CHECKOUT_SESSION_ID} placeholder is replaced by Stripe with the real
+ * session id. We don't call the Stripe API yet — we just surface a truncated
+ * order reference so the customer feels acknowledged. To show line items /
+ * receipt details later, fetch the session server-side here using the
+ * Stripe SDK and STRIPE_SECRET_KEY.
+ */
+
+const BRAND = {
+  bg: "#0a0a0c",
+  surface: "#15151a",
+  border: "#26262d",
+  primary: "#a8f0ed",
+  secondary: "#b897b3",
+  text: "#f1f5f9",
+  muted: "#94a3b8",
+  subtle: "#64748b",
+} as const;
+
+export const metadata: Metadata = {
+  title: "Thank you — Great Idea CS",
+  description:
+    "Payment confirmed. We&rsquo;ll be in touch within one business day to kick things off.",
+  robots: { index: false, follow: false },
+};
+
+export default async function ThanksPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ session_id?: string }>;
+}) {
+  const params = await searchParams;
+  const sessionId = params.session_id;
+  const orderRef = sessionId ? sessionId.slice(-12).toUpperCase() : null;
+
+  return (
+    <main
+      style={{
+        background: BRAND.bg,
+        minHeight: "100vh",
+        color: BRAND.text,
+        fontFamily:
+          "var(--font-inter), system-ui, -apple-system, sans-serif",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* ambient brand glow */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(60% 40% at 50% 0%, rgba(168,240,237,0.08) 0%, transparent 70%), radial-gradient(40% 30% at 50% 100%, rgba(184,151,179,0.05) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Header */}
+      <header
+        style={{
+          position: "relative",
+          padding: "24px 32px",
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <BrandMark />
+        <span style={{ fontWeight: 600, letterSpacing: "-0.01em" }}>
+          great idea <span style={{ color: BRAND.muted }}>cs</span>
+        </span>
+      </header>
+
+      {/* Hero */}
+      <section
+        style={{
+          position: "relative",
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "48px 24px 64px",
+        }}
+      >
+        <div style={{ maxWidth: 640, width: "100%", textAlign: "center" }}>
+          {/* success icon */}
+          <div
+            style={{
+              width: 88,
+              height: 88,
+              margin: "0 auto 32px",
+              borderRadius: 24,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background:
+                "linear-gradient(135deg, rgba(168,240,237,0.18), rgba(184,151,179,0.12))",
+              boxShadow: "0 0 80px rgba(168,240,237,0.18)",
+              border: `1px solid ${BRAND.border}`,
+            }}
+          >
+            <svg
+              width="44"
+              height="44"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={BRAND.primary}
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+          </div>
+
+          <p
+            style={{
+              fontSize: 12,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: BRAND.primary,
+              margin: "0 0 16px",
+              fontWeight: 600,
+            }}
+          >
+            Payment confirmed
+          </p>
+
+          <h1
+            style={{
+              fontSize: "clamp(2.75rem, 6vw, 4.5rem)",
+              lineHeight: 1.05,
+              letterSpacing: "-0.025em",
+              fontWeight: 600,
+              margin: "0 0 24px",
+            }}
+          >
+            Thank you.
+          </h1>
+
+          <p
+            style={{
+              fontSize: "1.125rem",
+              lineHeight: 1.65,
+              color: BRAND.muted,
+              margin: "0 auto",
+              maxWidth: 520,
+            }}
+          >
+            Your project is officially on. We&rsquo;ll reach out within{" "}
+            <span style={{ color: BRAND.text, fontWeight: 500 }}>
+              one business day
+            </span>{" "}
+            to schedule the kickoff and get the ball rolling.
+          </p>
+
+          {/* Order reference card */}
+          {orderRef && (
+            <div
+              style={{
+                marginTop: 40,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "12px 20px",
+                borderRadius: 12,
+                background: BRAND.surface,
+                border: `1px solid ${BRAND.border}`,
+                fontFamily:
+                  "ui-monospace, SFMono-Regular, Menlo, monospace",
+                fontSize: 13,
+              }}
+            >
+              <span style={{ color: BRAND.subtle, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                Order ref
+              </span>
+              <span style={{ color: BRAND.text }}>{orderRef}</span>
+            </div>
+          )}
+
+          {/* What's next */}
+          <div
+            style={{
+              marginTop: 56,
+              padding: "28px 32px",
+              borderRadius: 20,
+              background: BRAND.surface,
+              border: `1px solid ${BRAND.border}`,
+              textAlign: "left",
+            }}
+          >
+            <h2
+              style={{
+                fontSize: 18,
+                fontWeight: 600,
+                margin: "0 0 16px",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              What happens next
+            </h2>
+            <ol
+              style={{
+                margin: 0,
+                padding: 0,
+                listStyle: "none",
+                display: "flex",
+                flexDirection: "column",
+                gap: 14,
+                color: BRAND.muted,
+                fontSize: 15,
+                lineHeight: 1.6,
+              }}
+            >
+              <Step n={1}>You&rsquo;ll get a confirmation email with your receipt within a few minutes.</Step>
+              <Step n={2}>A real person from our team reads your intake and replies within one business day to set up a kickoff call.</Step>
+              <Step n={3}>We start shaping the work together. Most projects ship within three to six weeks.</Step>
+            </ol>
+          </div>
+
+          {/* CTAs */}
+          <div
+            style={{
+              marginTop: 40,
+              display: "flex",
+              gap: 12,
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <Link
+              href="https://greatidea-cs.com"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "14px 24px",
+                borderRadius: 9999,
+                background: BRAND.primary,
+                color: BRAND.bg,
+                fontWeight: 600,
+                textDecoration: "none",
+                fontSize: 15,
+                transition: "transform 200ms ease, box-shadow 200ms ease",
+                boxShadow: "0 8px 24px -8px rgba(168,240,237,0.45)",
+              }}
+            >
+              Back to greatidea-cs.com
+              <ArrowRight />
+            </Link>
+            <a
+              href="mailto:hello@greatidea-cs.com"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "14px 24px",
+                borderRadius: 9999,
+                color: BRAND.text,
+                fontWeight: 500,
+                textDecoration: "none",
+                fontSize: 15,
+                border: `1px solid ${BRAND.border}`,
+              }}
+            >
+              Email us
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer
+        style={{
+          position: "relative",
+          padding: "24px 32px 32px",
+          textAlign: "center",
+          fontSize: 13,
+          color: BRAND.subtle,
+        }}
+      >
+        © {new Date().getFullYear()} Great Idea Creative Services.
+        Need anything immediately?{" "}
+        <a href="mailto:hello@greatidea-cs.com" style={{ color: BRAND.primary, textDecoration: "none" }}>
+          hello@greatidea-cs.com
+        </a>
+      </footer>
+    </main>
+  );
+}
+
+function Step({ n, children }: { n: number; children: React.ReactNode }) {
+  return (
+    <li style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+      <span
+        style={{
+          flexShrink: 0,
+          width: 26,
+          height: 26,
+          borderRadius: 999,
+          background: "rgba(168,240,237,0.12)",
+          color: BRAND.primary,
+          fontSize: 12,
+          fontWeight: 600,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: 1,
+        }}
+      >
+        {n}
+      </span>
+      <span>{children}</span>
+    </li>
+  );
+}
+
+function ArrowRight() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12h14M13 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+function BrandMark() {
+  return (
+    <span
+      aria-hidden
+      style={{
+        width: 32,
+        height: 32,
+        borderRadius: 8,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background:
+          "linear-gradient(135deg, rgba(168,240,237,0.20), rgba(184,151,179,0.20))",
+        boxShadow: "0 0 30px rgba(168,240,237,0.18)",
+        border: `1px solid ${BRAND.border}`,
+      }}
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={BRAND.primary}
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+        <path d="M9 18h6" />
+        <path d="M10 22h4" />
+      </svg>
+    </span>
+  );
+}
