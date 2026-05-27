@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import ClarityAnalytics from "@/components/ClarityAnalytics";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -24,6 +25,7 @@ export default function RootLayout({
       <body className={`${poppins.variable} font-sans antialiased`}>
         {children}
         <Analytics />
+        <ClarityAnalytics />
       </body>
     </html>
   );

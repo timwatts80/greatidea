@@ -10,6 +10,7 @@
     "generate:css": "node scripts/generate-css-vars.js"
   },
   "dependencies": {
+    "@microsoft/clarity": "^1.0.2",
     "@notionhq/client": "^5.22.0",
     "@react-email/components": "^1.0.12",
     "@react-email/render": "^2.0.8",
