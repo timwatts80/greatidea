@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import ClarityAnalytics from "@/components/ClarityAnalytics";
 import "./globals.css";
+
+const GA_MEASUREMENT_ID = "G-HK9W7EMRCV";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -26,6 +29,18 @@ export default function RootLayout({
         {children}
         <Analytics />
         <ClarityAnalytics />
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          `}
+        </Script>
       </body>
     </html>
   );
