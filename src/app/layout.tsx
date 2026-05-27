@@ -1,27 +1,27 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
+import { Nunito } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import ClarityAnalytics from "@/components/ClarityAnalytics";
 import "./globals.css";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Great Idea CS — Bring your vision to life",
   description:
-    "Great Idea Creative Services builds modern websites, apps, design systems, and the quiet automation that runs your business. Built with craft. Accelerated by AI.",
+    "Custom AI solutions powered by Claude for creative projects, business workflows, and digital innovation.",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         {/* Google tag (gtag.js) */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-HK9W7EMRCV"></script>
@@ -35,7 +35,7 @@ gtag('config', 'G-HK9W7EMRCV');`,
           }}
         />
       </head>
-      <body className={`${poppins.variable} font-sans antialiased`}>
+      <body className={`${nunito.variable} antialiased`}>
         {children}
         <Analytics />
         <ClarityAnalytics />

@@ -1,522 +1,756 @@
-import Link from "next/link";
+"use client";
+
+import {
+  Lightbulb,
+  Sparkles,
+  Zap,
+  Rocket,
+  Code2,
+  Cpu,
+  ArrowRight,
+  Menu,
+  X,
+  GraduationCap,
+  BookOpen,
+  Users,
+  Trophy,
+  Mail,
+  Send,
+  Loader2,
+} from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Turnstile } from "@marsidev/react-turnstile";
+import { AdminCard } from "@/components/AdminCard";
+
+const TURNSTILE_SITE_KEY =
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA";
 
 export default function Home() {
-  return (
-    <div className="min-h-screen bg-surface text-ink">
-      <Nav />
-      <Hero />
-      <Audience />
-      <Services />
-      <Ai />
-      <Process />
-      <Outcomes />
-      <Cta />
-      <Footer />
-    </div>
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentPhrase, setCurrentPhrase] = useState(0);
+  const [isAdminMode, setIsAdminMode] = useState(false);
+
+  const phrases = [
+    { line1: "Transform Your", line2: "Digital Vision" },
+    { line1: "Elevate Your", line2: "Business with AI" },
+    { line1: "Create Your", line2: "Next Innovation" },
+  ];
+
+  const [subheader, setSubheader] = useState(
+    "Custom AI solutions powered by Claude for creative projects, business workflows, and digital innovation. From intelligent automation to cutting-edge interactive experiences."
   );
-}
 
-/* ------------------------------- Nav ------------------------------- */
+  // Contact form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    business_type: "",
+    message: "",
+  });
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
-function Nav() {
+  // Detect admin mode on client
+  useEffect(() => {
+    setIsAdminMode(
+      new URLSearchParams(window.location.search).get("admin") === "1"
+    );
+  }, []);
+
+  // Fetch hero content
+  useEffect(() => {
+    const cachedHero = sessionStorage.getItem("hero-content");
+
+    if (!isAdminMode && cachedHero) {
+      try {
+        const parsed = JSON.parse(cachedHero);
+        if (parsed.subheader) {
+          setSubheader(parsed.subheader);
+        }
+      } catch {
+        // keep fallback
+      }
+    } else {
+      fetch("https://api.greatidea-cs.com/v1/content/hero")
+        .then((res) => res.json())
+        .then((data) => {
+          const content = { subheader: data.subheader || subheader };
+          setSubheader(content.subheader);
+          sessionStorage.setItem("hero-content", JSON.stringify(content));
+        })
+        .catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAdminMode]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPhrase((prev) => (prev + 1) % phrases.length);
+    }, 3000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleFormChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (formErrors[e.target.name]) {
+      setFormErrors((prev) => {
+        const next = { ...prev };
+        delete next[e.target.name];
+        return next;
+      });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormErrors({});
+    setSubmitError("");
+
+    if (!turnstileToken) {
+      setSubmitError("Please complete the spam check.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const payload: Record<string, string> = {
+        name: formData.name,
+        email: formData.email,
+        turnstile_token: turnstileToken,
+      };
+      if (formData.business_type) payload.business_type = formData.business_type;
+      if (formData.message) payload.message = formData.message;
+
+      const response = await fetch("https://api.greatidea-cs.com/v1/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.ok) {
+        setSubmitSuccess(true);
+      } else if (response.status === 400 && data.errors) {
+        setFormErrors(data.errors);
+      } else if (response.status === 400 && data.error === "spam_check_failed") {
+        setSubmitError("Please complete the spam check and try again.");
+        setTurnstileToken("");
+      } else if (response.status === 429) {
+        setSubmitError("Too many submissions. Please wait a few minutes.");
+      } else {
+        setSubmitError(
+          "Something went wrong. Please email hello@greatidea-cs.com directly."
+        );
+      }
+    } catch {
+      setSubmitError(
+        "Something went wrong. Please email hello@greatidea-cs.com directly."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-md bg-surface/70 border-b border-border">
-      <div className="container-page h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <Logo />
-          <span className="font-semibold tracking-tight">Great Idea</span>
-          <span className="text-muted text-sm">CS</span>
-        </Link>
-        <nav className="hidden md:flex items-center gap-8 text-sm text-muted">
-          <a href="#services" className="hover:text-ink transition-colors">Services</a>
-          <a href="#approach" className="hover:text-ink transition-colors">Approach</a>
-          <a href="#process" className="hover:text-ink transition-colors">Process</a>
-          <a href="#contact" className="hover:text-ink transition-colors">Contact</a>
-        </nav>
-        <Link href="#contact" className="btn btn-primary btn-sm">Start a project</Link>
-      </div>
-    </header>
-  );
-}
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 md:h-20">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 subtle-glow">
+                <Lightbulb className="w-6 h-6 md:w-7 md:h-7 text-primary" strokeWidth={2.5} />
+              </div>
+              <span className="text-lg md:text-xl tracking-tight">
+                <span className="text-primary neon-text">great idea</span>
+                <span className="text-muted-foreground"> cs</span>
+              </span>
+            </div>
 
-function Logo() {
-  return (
-    <span
-      aria-hidden
-      className="inline-block w-7 h-7 rounded-sm shadow-soft bg-gradient-brand"
-    />
-  );
-}
+            <div className="hidden md:flex items-center gap-8">
+              <a href="#solutions" className="text-foreground/80 hover:text-primary transition-colors">Solutions</a>
+              <a href="#use-cases" className="text-foreground/80 hover:text-primary transition-colors">Use Cases</a>
+              <a href="#learning" className="text-foreground/80 hover:text-primary transition-colors">Learning</a>
+              <a href="#contact" className="text-foreground/80 hover:text-primary transition-colors">Contact</a>
+              <a href="#contact" className="glow-button-primary px-6 py-2.5 rounded-lg text-sm text-primary-foreground">
+                Get Started
+              </a>
+            </div>
 
-/* ------------------------------- Hero (Hook 1) ------------------------------- */
-
-function Hero() {
-  return (
-    <section className="bg-gradient-hero relative overflow-hidden">
-      <div className="container-page pt-20 pb-28 lg:pt-28 lg:pb-36">
-        <div className="max-w-3xl reveal">
-          <span className="t-eyebrow">Creative Services · Tech that fits</span>
-          <h1 className="mt-5 t-display">
-            Your great idea,
-            <br />
-            <span className="text-gradient-brand">built right.</span>
-          </h1>
-          <p className="mt-6 t-body-lg max-w-2xl">
-            We design websites, apps, and the quiet systems that run your business —
-            so you can spend your time on the part only you can do.
-          </p>
-          <div className="mt-9 flex flex-wrap items-center gap-3">
-            <Link href="#contact" className="btn btn-primary">
-              Tell us the idea
-              <ArrowRight />
-            </Link>
-            <a href="#services" className="btn btn-ghost">See what we build</a>
-          </div>
-
-          <div className="mt-12 flex items-center gap-6 t-body-sm">
-            <Avatars />
-            <span>Trusted by coaches, agents, and creators across the U.S.</span>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-foreground hover:text-primary transition-colors"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
 
-        <FloatingPreview />
-      </div>
-    </section>
-  );
-}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-card/95 backdrop-blur-xl border-t border-border">
+            <div className="px-4 py-6 space-y-4">
+              <a href="#solutions" className="block text-foreground/80 hover:text-primary transition-colors py-2">Solutions</a>
+              <a href="#use-cases" className="block text-foreground/80 hover:text-primary transition-colors py-2">Use Cases</a>
+              <a href="#learning" className="block text-foreground/80 hover:text-primary transition-colors py-2">Learning</a>
+              <a href="#contact" className="block text-foreground/80 hover:text-primary transition-colors py-2">Contact</a>
+              <a href="#contact" className="glow-button-primary w-full px-6 py-3 rounded-lg text-sm text-primary-foreground mt-4 block text-center">
+                Get Started
+              </a>
+            </div>
+          </div>
+        )}
+      </nav>
 
-function FloatingPreview() {
-  return (
-    <div className="hidden lg:block absolute right-[-40px] top-24 w-[460px] reveal">
-      <div className="relative">
+      {/* Hero */}
+      <section className="relative pt-32 md:pt-40 pb-20 md:pb-32 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 mb-8 subtle-glow">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm text-foreground/90">Powered by Claude AI</span>
+            </div>
+
+            <h1 className="text-4xl md:text-6xl lg:text-7xl mb-6 tracking-tight font-bold leading-none">
+              <div className="relative h-[1.2em] -mb-2">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={`line1-${currentPhrase}`}
+                    initial={{ y: 5, opacity: 0, filter: "blur(8px)", scale: 0.98 }}
+                    animate={{ y: 0, opacity: 1, filter: "blur(0px)", scale: 1 }}
+                    exit={{ y: -10, opacity: 0, filter: "blur(8px)", scale: 0.98 }}
+                    transition={{
+                      duration: 0.7,
+                      ease: [0.22, 0.03, 0.26, 1.0],
+                      y: { duration: 0.7, ease: [0.61, 1, 0.88, 1] },
+                    }}
+                    className="block absolute inset-0"
+                  >
+                    {phrases[currentPhrase].line1}
+                  </motion.span>
+                </AnimatePresence>
+              </div>
+              <div className="relative h-[1.2em] pb-2">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={`line2-${currentPhrase}`}
+                    initial={{ y: 5, opacity: 0, filter: "blur(8px)", scale: 0.98 }}
+                    animate={{ y: 0, opacity: 1, filter: "blur(0px)", scale: 1 }}
+                    exit={{ y: -10, opacity: 0, filter: "blur(8px)", scale: 0.98 }}
+                    transition={{
+                      duration: 0.7,
+                      ease: [0.22, 0.03, 0.26, 1.0],
+                      y: { duration: 0.7, ease: [0.61, 1, 0.88, 1] },
+                      delay: 0.05,
+                    }}
+                    className="block absolute inset-0 bg-gradient-to-r from-primary via-primary to-secondary bg-clip-text text-transparent neon-text"
+                  >
+                    {phrases[currentPhrase].line2}
+                  </motion.span>
+                </AnimatePresence>
+              </div>
+            </h1>
+
+            <p className="text-lg md:text-xl text-foreground/70 mb-12 max-w-2xl mx-auto leading-relaxed">
+              {subheader}
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a href="#contact" className="glow-button-primary px-8 py-4 rounded-xl text-primary-foreground w-full sm:w-auto flex items-center justify-center gap-2">
+                Start Your Project
+                <ArrowRight className="w-5 h-5" />
+              </a>
+              <a href="#use-cases" className="glow-button-secondary px-8 py-4 rounded-xl text-foreground w-full sm:w-auto text-center">
+                View Examples
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="absolute top-1/4 left-10 w-64 h-64 bg-primary/20 rounded-full blur-3xl opacity-20 pointer-events-none" />
+        <div className="absolute bottom-1/4 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl opacity-20 pointer-events-none" />
+      </section>
+
+      {/* Claude Highlight */}
+      <section className="relative py-20 md:py-32 px-4 sm:px-6 lg:px-8">
+        <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-background" />
         <div
-          aria-hidden
-          className="absolute -inset-8 rounded-2xl blur-2xl opacity-60"
+          className="absolute inset-0 opacity-[0.08]"
           style={{
             background:
-              "radial-gradient(60% 60% at 50% 50%, rgba(245,158,11,0.28), transparent 70%)",
+              "radial-gradient(ellipse 180% 150% at 0% 0%, #a8f0ed 0%, transparent 60%)",
           }}
         />
-        <div className="relative card shadow-lift p-5">
-          <div className="flex items-center gap-1.5 pb-3 border-b border-border">
-            <span className="w-2.5 h-2.5 rounded-pill bg-border-strong" />
-            <span className="w-2.5 h-2.5 rounded-pill bg-border-strong" />
-            <span className="w-2.5 h-2.5 rounded-pill bg-border-strong" />
-            <span className="ml-3 text-xs text-muted">your-studio.com</span>
-          </div>
-          <div className="pt-5 space-y-4">
-            <div className="h-3 w-1/3 rounded-pill bg-surface-alt" />
-            <div className="h-7 w-3/4 rounded-sm bg-ink/90" />
-            <div className="h-3 w-2/3 rounded-pill bg-surface-alt" />
-            <div className="grid grid-cols-3 gap-3 pt-2">
-              <div className="aspect-square rounded-md bg-brand-soft" />
-              <div className="aspect-square rounded-md bg-gradient-brand-soft" />
-              <div className="aspect-square rounded-md bg-accent-soft" />
-            </div>
-            <div className="flex items-center justify-between pt-2">
-              <div className="h-8 w-24 rounded-pill bg-ink" />
-              <div className="flex items-center gap-1.5 text-xs text-muted">
-                <Spark /> Live
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="absolute -left-10 top-44 rotate-[-6deg] chip">
-          <Spark /> Booking automated
-        </div>
-        <div className="absolute -right-6 -bottom-6 rotate-[4deg] chip">
-          <span className="inline-block w-2 h-2 rounded-pill bg-accent" />
-          +38% qualified leads
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Avatars() {
-  const bgs = [
-    "linear-gradient(135deg,#c7d2fe,#fde68a)",
-    "linear-gradient(135deg,#fde68a,#fbcfe8)",
-    "linear-gradient(135deg,#bae6fd,#c7d2fe)",
-    "linear-gradient(135deg,#fbcfe8,#bbf7d0)",
-  ];
-  return (
-    <div className="flex -space-x-2">
-      {bgs.map((bg, i) => (
-        <span
-          key={i}
-          aria-hidden
-          className="w-8 h-8 rounded-pill border-2 border-surface"
-          style={{ background: bg }}
-        />
-      ))}
-    </div>
-  );
-}
-
-/* --------------------- Audience recognition (Hook 2) --------------------- */
-
-function Audience() {
-  const niches = [
-    "Real estate agents",
-    "Coaches",
-    "Fitness studios",
-    "Content creators",
-    "Therapists",
-    "Boutique brands",
-    "Consultants",
-    "Local services",
-  ];
-  return (
-    <section id="approach" className="border-y border-border bg-surface">
-      <div className="container-page section-y">
-        <div className="grid lg:grid-cols-12 gap-10">
-          <div className="lg:col-span-5">
-            <span className="t-eyebrow">Built for the work you actually do</span>
-            <h2 className="mt-4 t-h1">
-              You started this to <span className="text-brand">do the thing</span>.
-              <br />
-              Not to wrestle with the tech.
-            </h2>
-            <p className="mt-5 t-body-lg">
-              The clients. The classes. The listings. The work itself. We handle the
-              software, the look, the wiring underneath — so the parts that need
-              <em> you </em> get all of you.
-            </p>
-          </div>
-          <div className="lg:col-span-7">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {niches.map((n) => (
-                <div key={n} className="chip justify-start">{n}</div>
-              ))}
-              <div
-                className="rounded-md px-4 py-4 text-sm col-span-2 sm:col-span-1 flex items-center justify-center text-center bg-gradient-brand"
-                style={{ color: "var(--color-on-brand)" }}
-              >
-                + You
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------- Services ------------------------------- */
-
-function Services() {
-  const items = [
-    { title: "Websites that earn their place", desc: "Modern, fast, search-friendly sites that turn visitors into clients.", icon: <IconBrowser /> },
-    { title: "Apps & business tools", desc: "Custom web apps, internal tools, and dashboards built around how you work.", icon: <IconApp /> },
-    { title: "Video & content", desc: "Short-form, long-form, and brand films tuned for the platforms you live on.", icon: <IconPlay /> },
-    { title: "Design systems", desc: "A consistent, scalable visual language that grows with your brand.", icon: <IconLayers /> },
-    { title: "eCommerce", desc: "Storefronts, checkouts, and product flows that feel as good as they convert.", icon: <IconBag /> },
-    { title: "Automation & reporting", desc: "Quiet systems that run bookings, follow-ups, and the metrics that matter.", icon: <IconChart /> },
-  ];
-
-  return (
-    <section id="services" className="bg-gradient-band">
-      <div className="container-page section-y">
-        <div className="max-w-2xl">
-          <span className="t-eyebrow">What we do</span>
-          <h2 className="mt-4 t-h1">Everything around the idea — so the idea can breathe.</h2>
-        </div>
-
-        <div className="mt-14 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {items.map((it) => (
-            <div key={it.title} className="card card-interactive">
-              <div className="w-11 h-11 rounded-md flex items-center justify-center mb-5 bg-accent-soft text-accent">
-                {it.icon}
-              </div>
-              <h3 className="t-h3">{it.title}</h3>
-              <p className="mt-2 t-body-sm">{it.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* --------------------- AI section (Hook 3, calm) --------------------- */
-
-function Ai() {
-  return (
-    <section className="relative overflow-hidden">
-      <div className="container-page section-y">
-        <div className="grid lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-6">
-            <span className="t-eyebrow">A quiet advantage</span>
-            <h2 className="mt-4 t-h1">
-              Craft you can feel.
-              <br />
-              <span className="text-muted">Speed you can&rsquo;t.</span>
-            </h2>
-            <p className="mt-5 t-body-lg">
-              We use AI the way good studios use any sharp tool — to take the
-              friction out of the work and put more of our attention on you. You get
-              the thinking of a senior team, on a timeline that used to require one.
-            </p>
-            <ul className="mt-7 space-y-3 text-[15px]">
-              {[
-                "Drafts and explorations in days, not weeks",
-                "Content, copy, and assets that stay on-brand",
-                "Automations that handle the repetitive — invisibly",
-              ].map((t) => (
-                <li key={t} className="flex items-start gap-3">
-                  <Check />
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="lg:col-span-6">
-            <div className="panel p-8 sm:p-10 overflow-hidden">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-xs text-muted">
-                  <Spark /> Working on your project
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="glow-card p-8 md:p-12 lg:p-16 rounded-3xl">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 mb-6 subtle-glow">
+                  <Cpu className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-foreground/90">Anthropic&apos;s Claude</span>
                 </div>
-                <PulseLine label="Drafting hero concepts" pct={92} />
-                <PulseLine label="Wiring booking flow" pct={64} />
-                <PulseLine label="Writing on-brand copy" pct={78} />
-                <PulseLine label="Setting up reporting" pct={40} />
+                <h2 className="text-3xl md:text-4xl mb-6">
+                  Built on <span className="text-primary neon-text">Claude</span>
+                </h2>
+                <p className="text-foreground/70 text-lg mb-6 leading-relaxed">
+                  We leverage Claude by Anthropic—one of the most advanced AI systems
+                  available—to power intelligent, context-aware solutions that understand
+                  nuance and deliver exceptional results.
+                </p>
+                <p className="text-foreground/60 leading-relaxed mb-8">
+                  Whether it&apos;s automating complex workflows, generating creative content,
+                  or building sophisticated tools, Claude&apos;s capabilities enable us to create
+                  solutions that truly understand and adapt to your needs.
+                </p>
+                <a
+                  href="https://claude.ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+                >
+                  <span>Learn more about Claude</span>
+                  <ArrowRight className="w-4 h-4" />
+                </a>
               </div>
-              <div className="mt-8 pt-6 border-t border-border flex items-center justify-between">
-                <span className="t-body-sm">Senior team · AI-accelerated</span>
-                <span className="text-xs font-medium px-3 py-1.5 rounded-pill bg-brand-soft text-brand">
-                  ~3 weeks to launch
-                </span>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: "Advanced Reasoning", value: "Context-aware analysis" },
+                  { label: "Creative Output", value: "Natural language mastery" },
+                  { label: "Code Generation", value: "Multiple languages" },
+                  { label: "Vision Capabilities", value: "Image understanding" },
+                ].map((feature, index) => (
+                  <div
+                    key={index}
+                    className="p-6 rounded-xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border"
+                  >
+                    <div className="text-sm text-foreground/60 mb-2">{feature.label}</div>
+                    <div className="text-foreground">{feature.value}</div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-function PulseLine({ label, pct }: { label: string; pct: number }) {
-  return (
-    <div>
-      <div className="flex items-center justify-between text-sm mb-2">
-        <span className="text-ink">{label}</span>
-        <span className="text-muted">{pct}%</span>
-      </div>
-      <div className="h-2 rounded-pill bg-surface-alt overflow-hidden">
-        <div
-          className="h-full rounded-pill bg-gradient-brand"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------- Process ------------------------------- */
-
-function Process() {
-  const steps = [
-    { n: "01", t: "Listen", d: "A real conversation about your business — not a discovery template." },
-    { n: "02", t: "Shape", d: "We turn the idea into something you can see, click, and react to." },
-    { n: "03", t: "Build", d: "Senior craft, fast iterations, and you in the loop the whole way." },
-    { n: "04", t: "Launch & care", d: "Go live with confidence. We stay on for the long arc." },
-  ];
-
-  return (
-    <section id="process" className="bg-surface border-t border-border">
-      <div className="container-page section-y">
-        <div className="flex flex-wrap items-end justify-between gap-6 mb-14">
-          <div className="max-w-2xl">
-            <span className="t-eyebrow">How it works</span>
-            <h2 className="mt-4 t-h1">
-              Simple on the outside.
-              <br />
-              <span className="text-muted">Serious underneath.</span>
+      {/* Solutions */}
+      <section id="solutions" className="py-20 md:py-32 px-4 sm:px-6 lg:px-8 gradient-section">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl mb-4">
+              <span className="text-primary neon-text">Claude-Powered</span> Solutions
             </h2>
-          </div>
-          <p className="t-body max-w-sm">
-            Most projects launch in three to six weeks. No bloated decks. No surprises.
-          </p>
-        </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {steps.map((s, i) => (
-            <div key={s.n} className="card bg-surface-alt">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-xs font-mono font-medium px-2 py-1 rounded-xs bg-surface text-brand">
-                  {s.n}
-                </span>
-                {i < steps.length - 1 && (
-                  <span className="hidden lg:block flex-1 h-px bg-border-strong" />
-                )}
-              </div>
-              <h3 className="t-h3">{s.t}</h3>
-              <p className="mt-2 t-body-sm">{s.d}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------- Outcomes ------------------------------- */
-
-function Outcomes() {
-  const stats = [
-    { v: "3–6 wk", l: "Typical time to launch" },
-    { v: "100%", l: "Senior hands on every project" },
-    { v: "1:1", l: "Direct line to your designer & dev" },
-  ];
-  return (
-    <section className="border-t border-border" style={{ background: "var(--gradient-band)" }}>
-      <div className="container-page py-20 lg:py-24">
-        <div className="grid sm:grid-cols-3 gap-10 sm:gap-6">
-          {stats.map((s) => (
-            <div key={s.l}>
-              <div className="text-5xl sm:text-6xl font-semibold tracking-tight text-gradient-ink">
-                {s.v}
-              </div>
-              <div className="mt-2 t-body">{s.l}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ----------------------- Closing CTA (Hook 4) ----------------------- */
-
-function Cta() {
-  return (
-    <section id="contact" className="bg-surface">
-      <div className="container-page section-y">
-        <div className="relative overflow-hidden rounded-panel border border-border bg-gradient-cta p-10 sm:p-16">
-          <div className="max-w-2xl">
-            <span className="t-eyebrow">Let&rsquo;s start</span>
-            <h2 className="mt-4 t-h1">
-              Tell us the idea.
-              <br />
-              <span className="text-gradient-brand">We&rsquo;ll show you what&rsquo;s possible.</span>
-            </h2>
-            <p className="mt-5 t-body-lg">
-              A 20-minute call. No pitch. You leave with a clear sense of what to
-              build, what it costs, and what it takes.
+            <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
+              Intelligent capabilities tailored to your unique needs
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a href="mailto:hello@greatidea.cs" className="btn btn-primary">
-                Book a 20-min call
-                <ArrowRight />
-              </a>
-              <a href="mailto:hello@greatidea.cs" className="btn btn-ghost">hello@greatidea.cs</a>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {[
+              { icon: Cpu, title: "Claude-Powered Automation", description: "Streamline workflows with intelligent automation that understands context and adapts to your processes." },
+              { icon: Code2, title: "Custom Tools", description: "Bespoke applications and integrations built to solve your specific challenges." },
+              { icon: Sparkles, title: "Creative AI with Claude", description: "Generate sophisticated content, design assets, and interactive experiences with Claude's advanced language capabilities." },
+              { icon: Zap, title: "Smart Analytics", description: "Transform data into actionable insights with AI-powered analysis and visualization." },
+              { icon: Rocket, title: "Rapid Prototyping", description: "Go from concept to working prototype in days, not months, with AI-accelerated development." },
+              { icon: Lightbulb, title: "Innovation Lab", description: "Explore cutting-edge AI capabilities for games, apps, and experimental projects." },
+            ].map((solution, index) => (
+              <div key={index} className="glow-card p-6 md:p-8 rounded-2xl">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-4 subtle-glow">
+                  <solution.icon className="w-6 h-6 text-primary" strokeWidth={2} />
+                </div>
+                <h3 className="text-xl mb-3">{solution.title}</h3>
+                <p className="text-foreground/70 leading-relaxed">{solution.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Use Cases */}
+      <section id="use-cases" className="py-20 md:py-32 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl mb-4">
+              Built for <span className="text-primary neon-text">Every Vision</span>
+            </h2>
+            <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
+              From enterprise workflows to creative experiments
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="glow-card p-8 md:p-10 rounded-2xl">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center subtle-glow shrink-0">
+                  <Code2 className="w-7 h-7 text-primary" strokeWidth={2} />
+                </div>
+                <div>
+                  <h3 className="text-2xl mb-2">Business &amp; Enterprise</h3>
+                  <p className="text-foreground/60">Optimize operations and scale efficiently</p>
+                </div>
+              </div>
+              <ul className="space-y-4 text-foreground/70">
+                {[
+                  "Workflow automation and process optimization",
+                  "Custom CRM and data management systems",
+                  "AI-powered customer service solutions",
+                  "Analytics dashboards and reporting tools",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="glow-card p-8 md:p-10 rounded-2xl">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-secondary/30 to-secondary/10 flex items-center justify-center subtle-glow shrink-0">
+                  <Sparkles className="w-7 h-7 text-secondary" strokeWidth={2} />
+                </div>
+                <div>
+                  <h3 className="text-2xl mb-2">Creative &amp; Digital</h3>
+                  <p className="text-foreground/60">Bring your creative ideas to life</p>
+                </div>
+              </div>
+              <ul className="space-y-4 text-foreground/70">
+                {[
+                  "Interactive web experiences and games",
+                  "AI-assisted content generation tools",
+                  "Custom apps and digital products",
+                  "Prototypes and proof-of-concept builds",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-/* ------------------------------- Footer ------------------------------- */
+      {/* Learning */}
+      <section id="learning" className="py-20 md:py-32 px-4 sm:px-6 lg:px-8 gradient-section">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 mb-6 subtle-glow">
+              <GraduationCap className="w-4 h-4 text-primary" />
+              <span className="text-sm text-foreground/90">Claude AI Education &amp; Training</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl mb-4">
+              Master <span className="text-primary neon-text">Claude &amp; AI</span> for Your Future
+            </h2>
+            <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
+              Comprehensive education on Claude and modern AI—from fundamentals to advanced implementation
+            </p>
+          </div>
 
-function Footer() {
-  return (
-    <footer className="border-t border-border bg-surface">
-      <div className="container-page py-12 flex flex-wrap items-center justify-between gap-6">
-        <div className="flex items-center gap-2">
-          <Logo />
-          <span className="font-semibold tracking-tight">Great Idea</span>
-          <span className="text-muted text-sm">CS</span>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 mb-12">
+            {[
+              {
+                icon: BookOpen,
+                title: "Claude & AI Fundamentals",
+                description: "Understand Claude's capabilities and core concepts of modern AI systems.",
+                topics: ["Claude.ai Overview", "LLMs & Generative AI", "Prompt Engineering", "AI Ethics & Safety"],
+              },
+              {
+                icon: Code2,
+                title: "Practical Implementation",
+                description: "Learn to integrate Claude into your workflows and build custom solutions.",
+                topics: ["Claude API Integration", "Automation Workflows", "Custom Tools with Claude", "Best Practices"],
+              },
+              {
+                icon: Rocket,
+                title: "Advanced Strategies",
+                description: "Leverage AI for competitive advantage and innovative applications.",
+                topics: ["AI Strategy", "Scaling Solutions", "ROI Optimization", "Future Trends"],
+              },
+            ].map((track, index) => (
+              <div key={index} className="glow-card p-6 md:p-8 rounded-2xl">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-4 subtle-glow">
+                  <track.icon className="w-6 h-6 text-primary" strokeWidth={2} />
+                </div>
+                <h3 className="text-xl mb-3">{track.title}</h3>
+                <p className="text-foreground/70 mb-6 leading-relaxed">{track.description}</p>
+                <div className="space-y-2">
+                  {track.topics.map((topic, i) => (
+                    <div key={i} className="flex items-center gap-2 text-sm text-foreground/60">
+                      <div className="w-1 h-1 rounded-full bg-primary" />
+                      <span>{topic}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div className="glow-card p-8 rounded-2xl">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center subtle-glow shrink-0">
+                  <Users className="w-6 h-6 text-primary" strokeWidth={2} />
+                </div>
+                <div>
+                  <h3 className="text-2xl mb-2">Team Workshops</h3>
+                  <p className="text-foreground/60">Customized training for your organization</p>
+                </div>
+              </div>
+              <ul className="space-y-3 text-foreground/70 mb-6">
+                {[
+                  "On-site or remote sessions",
+                  "Tailored to your industry and use cases",
+                  "Hands-on exercises and real-world projects",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <a href="#contact" className="glow-button-secondary px-6 py-3 rounded-lg text-foreground w-full text-center block">
+                Book a Workshop
+              </a>
+            </div>
+
+            <div className="glow-card p-8 rounded-2xl">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-secondary/30 to-secondary/10 flex items-center justify-center subtle-glow shrink-0">
+                  <Trophy className="w-6 h-6 text-secondary" strokeWidth={2} />
+                </div>
+                <div>
+                  <h3 className="text-2xl mb-2">1-on-1 Mentorship</h3>
+                  <p className="text-foreground/60">Personalized guidance for your journey</p>
+                </div>
+              </div>
+              <ul className="space-y-3 text-foreground/70 mb-6">
+                {[
+                  "Custom learning path based on your goals",
+                  "Project-based learning with real deliverables",
+                  "Ongoing support and Q&A",
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-secondary mt-2 shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <a href="#contact" className="glow-button-secondary px-6 py-3 rounded-lg text-foreground w-full text-center block">
+                Apply for Mentorship
+              </a>
+            </div>
+          </div>
         </div>
-        <div className="t-body-sm">
-          © {new Date().getFullYear()} Great Idea Creative Services. Built with care.
-        </div>
-        <div className="flex items-center gap-5 t-body-sm">
-          <a href="#services" className="hover:text-ink">Services</a>
-          <a href="#process" className="hover:text-ink">Process</a>
-          <a href="#contact" className="hover:text-ink">Contact</a>
-        </div>
-      </div>
-    </footer>
-  );
-}
+      </section>
 
-/* ------------------------------- Icons ------------------------------- */
+      {/* CTA */}
+      <section className="py-20 md:py-32 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="glow-card p-10 md:p-16 rounded-3xl text-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mx-auto mb-6 subtle-glow">
+              <Lightbulb className="w-8 h-8 text-primary" strokeWidth={2.5} />
+            </div>
+            <h2 className="text-3xl md:text-5xl mb-6">
+              Ready to Build Something <span className="text-primary neon-text">Great</span>?
+            </h2>
+            <p className="text-foreground/70 text-lg mb-10 max-w-2xl mx-auto">
+              Let&apos;s turn your ideas into reality with custom Claude-powered AI solutions designed for your unique needs.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a href="#contact" className="glow-button-primary px-8 py-4 rounded-xl text-primary-foreground w-full sm:w-auto flex items-center justify-center gap-2">
+                Start a Project
+                <ArrowRight className="w-5 h-5" />
+              </a>
+              <a href="#contact" className="glow-button-secondary px-8 py-4 rounded-xl text-foreground w-full sm:w-auto text-center">
+                Schedule a Call
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
-function ArrowRight() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 12h14M13 5l7 7-7 7" />
-    </svg>
-  );
-}
-function Check() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="mt-0.5 shrink-0" aria-hidden>
-      <circle cx="12" cy="12" r="10" fill="var(--color-accent-soft)" />
-      <path d="M8 12.5l2.5 2.5L16 9.5" stroke="var(--color-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    </svg>
-  );
-}
-function Spark() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" />
-    </svg>
-  );
-}
-function IconBrowser() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="16" rx="2.5" />
-      <path d="M3 9h18" />
-      <circle cx="6.5" cy="6.5" r="0.6" fill="currentColor" />
-      <circle cx="8.8" cy="6.5" r="0.6" fill="currentColor" />
-    </svg>
-  );
-}
-function IconApp() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="6" y="2.5" width="12" height="19" rx="2.5" />
-      <path d="M10.5 18.5h3" />
-    </svg>
-  );
-}
-function IconPlay() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M10 8.5v7l6-3.5-6-3.5z" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-function IconLayers() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3l9 5-9 5-9-5 9-5z" />
-      <path d="M3 13l9 5 9-5" />
-      <path d="M3 17l9 5 9-5" />
-    </svg>
-  );
-}
-function IconBag() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 8h14l-1.2 11.2a2 2 0 01-2 1.8H8.2a2 2 0 01-2-1.8L5 8z" />
-      <path d="M9 8V6a3 3 0 016 0v2" />
-    </svg>
-  );
-}
-function IconChart() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 19V5" />
-      <path d="M4 19h16" />
-      <path d="M8 16v-5M12 16V8M16 16v-3" />
-    </svg>
+      {/* Contact */}
+      <section id="contact" className="py-20 md:py-32 px-4 sm:px-6 lg:px-8 gradient-section">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 mb-6 subtle-glow">
+              <Mail className="w-4 h-4 text-primary" />
+              <span className="text-sm text-foreground/90">Get in Touch</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl mb-4">
+              Let&apos;s <span className="text-primary neon-text">Connect</span>
+            </h2>
+            <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
+              Ready to bring your ideas to life? Fill out the form below and we&apos;ll get back to you soon.
+            </p>
+          </div>
+
+          <div className="glow-card p-8 md:p-12 rounded-2xl">
+            {submitSuccess ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
+                  <Send className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-2xl mb-3">Thanks for reaching out!</h3>
+                <p className="text-foreground/70">We&apos;ll be in touch within one business day.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm text-foreground/80 mb-2">
+                    Name <span className="text-destructive">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleFormChange}
+                    required
+                    className={`w-full px-4 py-3 rounded-lg bg-input-background border ${
+                      formErrors.name ? "border-destructive" : "border-border"
+                    } text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
+                    placeholder="Your name"
+                  />
+                  {formErrors.name && <p className="text-destructive text-sm mt-1">{formErrors.name}</p>}
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm text-foreground/80 mb-2">
+                    Email <span className="text-destructive">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleFormChange}
+                    required
+                    className={`w-full px-4 py-3 rounded-lg bg-input-background border ${
+                      formErrors.email ? "border-destructive" : "border-border"
+                    } text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
+                    placeholder="your@email.com"
+                  />
+                  {formErrors.email && <p className="text-destructive text-sm mt-1">{formErrors.email}</p>}
+                </div>
+
+                <div>
+                  <label htmlFor="business_type" className="block text-sm text-foreground/80 mb-2">
+                    Type of Business
+                  </label>
+                  <select
+                    id="business_type"
+                    name="business_type"
+                    value={formData.business_type}
+                    onChange={handleFormChange}
+                    className={`w-full px-4 py-3 rounded-lg bg-input-background border ${
+                      formErrors.business_type ? "border-destructive" : "border-border"
+                    } text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
+                  >
+                    <option value="">Select...</option>
+                    <option value="Real estate">Real estate</option>
+                    <option value="Coach">Coach</option>
+                    <option value="Fitness">Fitness</option>
+                    <option value="Creator">Creator</option>
+                    <option value="Other">Other</option>
+                  </select>
+                  {formErrors.business_type && (
+                    <p className="text-destructive text-sm mt-1">{formErrors.business_type}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm text-foreground/80 mb-2">
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleFormChange}
+                    rows={6}
+                    maxLength={2000}
+                    className={`w-full px-4 py-3 rounded-lg bg-input-background border ${
+                      formErrors.message ? "border-destructive" : "border-border"
+                    } text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none`}
+                    placeholder="Tell us about your project..."
+                  />
+                  {formErrors.message && <p className="text-destructive text-sm mt-1">{formErrors.message}</p>}
+                </div>
+
+                <div>
+                  <Turnstile
+                    siteKey={TURNSTILE_SITE_KEY}
+                    onSuccess={(token) => setTurnstileToken(token)}
+                    onError={() => setTurnstileToken("")}
+                    onExpire={() => setTurnstileToken("")}
+                    options={{ theme: "dark" }}
+                  />
+                </div>
+
+                {submitError && (
+                  <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20">
+                    <p className="text-destructive text-sm">{submitError}</p>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="glow-button-primary w-full px-8 py-4 rounded-xl text-primary-foreground flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      Send Message
+                      <Send className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-border py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20">
+                <Lightbulb className="w-5 h-5 text-primary" strokeWidth={2.5} />
+              </div>
+              <span className="text-sm tracking-tight">
+                <span className="text-primary">great idea</span>
+                <span className="text-muted-foreground"> cs</span>
+              </span>
+            </div>
+            <p className="text-sm text-foreground/60">
+              © 2026 great idea cs. Claude-powered solutions for the digital age.
+            </p>
+          </div>
+        </div>
+      </footer>
+
+      {isAdminMode && <AdminCard />}
+    </div>
   );
 }

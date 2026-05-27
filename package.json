@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run generate:css && next dev --turbopack",
-    "build": "npm run generate:css && next build --turbopack",
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint",
-    "generate:css": "node scripts/generate-css-vars.js"
+    "lint": "eslint"
   },
   "dependencies": {
+    "@marsidev/react-turnstile": "^1.5.2",
     "@microsoft/clarity": "^1.0.2",
     "@notionhq/client": "^5.22.0",
     "@react-email/components": "^1.0.12",
@@ -17,6 +17,8 @@
     "@upstash/ratelimit": "^2.0.8",
     "@vercel/analytics": "^2.0.1",
     "@vercel/kv": "^3.0.0",
+    "lucide-react": "^1.16.0",
+    "motion": "^12.40.0",
     "next": "15.5.9",
     "react": "19.1.0",
     "react-dom": "19.1.0",

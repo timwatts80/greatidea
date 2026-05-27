@@ -1,365 +1,231 @@
 @import "tailwindcss";
 
-/* =========================================================================
-   DESIGN TOKENS
-   The single source of truth. Edit values here; the rest of the app updates.
-   Layers:
-     1. Primitives  — raw values (hex, px, durations). No semantic meaning.
-     2. Semantic    — meaning-bearing aliases (surface, ink, brand). Use these.
-     3. Component   — narrow tokens for specific patterns (button, card).
-   Tailwind v4 picks these up via @theme inline and emits utilities like
-   `bg-surface`, `text-muted`, `border-subtle`, `shadow-soft`, `rounded-card`.
-   ========================================================================= */
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  /* ---------- 1. PRIMITIVES ---------- */
-
-  /* Brand */
-  --green-50:  #ecfdf5;
-  --green-100: #d1fae5;
-  --green-500: #10b981;
-  --green-600: #059669;
-  --green-700: #047857;
-
-  --amber-50:   #fffbeb;
-  --amber-100:  #fef3c7;
-  --amber-500:  #f59e0b;
-  --amber-600:  #d97706;
-  --amber-700:  #b45309;
-
-  /* Neutrals (scoped to the 4 the brief allows + utility stops) */
-  --neutral-0:    #ffffff;   /* white */
-  --neutral-50:   #f8fafc;   /* light */
-  --neutral-100:  #f1f5f9;   /* hairline / border */
-  --neutral-200:  #e2e8f0;   /* border strong */
-  --neutral-500:  #64748b;   /* mid */
-  --neutral-900:  #0f172a;   /* black / ink */
-
-  /* Spacing scale (tailwind defaults are fine; expose semantic gutters) */
-  --space-section-y:    6rem;     /* 96px */
-  --space-section-y-lg: 8rem;     /* 128px */
-  --space-container-x:  1.5rem;   /* 24px */
-
-  /* Radii */
-  --radius-xs:   0.375rem;  /* 6 */
-  --radius-sm:   0.5rem;    /* 8 */
-  --radius-md:   0.75rem;   /* 12 */
-  --radius-lg:   1rem;      /* 16 */
-  --radius-xl:   1.5rem;    /* 24 */
-  --radius-2xl:  2rem;      /* 32 */
-  --radius-pill: 9999px;
-
-  /* Elevation (subtle, layered) */
-  --shadow-xs:    0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-soft:  0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -8px rgba(15, 23, 42, 0.08);
-  --shadow-lift:  0 1px 2px rgba(15, 23, 42, 0.04), 0 20px 48px -16px rgba(15, 23, 42, 0.12);
-  --shadow-glow:  0 8px 24px -8px rgba(245, 158, 11, 0.45);
-
-  /* Motion */
-  --motion-fast:    150ms;
-  --motion-base:    200ms;
-  --motion-slow:    400ms;
-  --motion-reveal:  700ms;
-  --ease-out:       cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-out:    cubic-bezier(0.65, 0, 0.35, 1);
-
-  /* Type scale (display + body) */
-  --font-size-eyebrow:  0.75rem;
-  --font-size-body-sm:  0.875rem;
-  --font-size-body:     1rem;
-  --font-size-body-lg:  1.125rem;
-  --font-size-h3:       1.5rem;     /* 24 */
-  --font-size-h2:       2.25rem;    /* 36 */
-  --font-size-h1:       3rem;       /* 48 */
-  --font-size-display:  4.5rem;     /* 72 */
-  --leading-tight:      1.05;
-  --leading-snug:       1.2;
-  --leading-normal:     1.5;
-  --leading-relaxed:    1.65;
-  --tracking-eyebrow:   0.12em;
-  --tracking-tight:     -0.02em;
-
-  /* ---------- 2. SEMANTIC ALIASES ---------- */
-
-  /* Surfaces */
-  --color-surface:        var(--neutral-0);
-  --color-surface-alt:    var(--neutral-50);
-  --color-surface-raised: var(--neutral-0);
-  --color-surface-inverse:var(--neutral-900);
-
-  /* Text */
-  --color-ink:        var(--neutral-900);
-  --color-muted:      var(--neutral-500);
-  --color-subtle:     var(--neutral-200);
-  --color-on-brand:   var(--neutral-0);
-  --color-on-inverse: var(--neutral-0);
-
-  /* Borders */
-  --color-border:        var(--neutral-100);
-  --color-border-strong: var(--neutral-200);
-
-  /* Brand */
-  --color-brand:         var(--amber-500);
-  --color-brand-hover:   var(--amber-600);
-  --color-brand-soft:    var(--amber-50);
-  --color-brand-muted:   var(--amber-100);
-
-  --color-accent:        var(--green-600);
-  --color-accent-hover:  var(--green-700);
-  --color-accent-soft:   var(--green-50);
-  --color-accent-muted:  var(--green-100);
-
-  /* Gradients (semantic) */
-  --gradient-brand:
-    linear-gradient(120deg, var(--amber-500) 0%, #ca8a04 100%);
-  --gradient-brand-soft:
-    linear-gradient(135deg, var(--amber-50) 0%, var(--amber-100) 100%);
-  --gradient-hero:
-    radial-gradient(60% 50% at 80% 0%, rgba(245, 158, 11, 0.18) 0%, transparent 60%),
-    radial-gradient(50% 40% at 0% 20%, rgba(5, 150, 105, 0.06) 0%, transparent 60%),
-    linear-gradient(180deg, var(--color-surface) 0%, var(--color-surface-alt) 100%);
-  --gradient-band:
-    radial-gradient(40% 60% at 100% 50%, rgba(245, 158, 11, 0.10) 0%, transparent 70%),
-    linear-gradient(180deg, var(--color-surface-alt) 0%, var(--color-surface) 100%);
-  --gradient-cta:
-    radial-gradient(60% 80% at 100% 0%, rgba(245, 158, 11, 0.22) 0%, transparent 60%),
-    radial-gradient(60% 80% at 0% 100%, rgba(5, 150, 105, 0.08) 0%, transparent 60%),
-    var(--color-surface);
-  --gradient-panel:
-    radial-gradient(80% 60% at 100% 0%, rgba(245, 158, 11, 0.18) 0%, transparent 60%),
-    radial-gradient(70% 60% at 0% 100%, rgba(5, 150, 105, 0.06) 0%, transparent 60%),
-    var(--color-surface);
-
-  /* ---------- 3. COMPONENT TOKENS ---------- */
-
-  --button-radius:        var(--radius-pill);
-  --button-padding-y:     0.875rem;
-  --button-padding-x:     1.5rem;
-  --card-radius:          var(--radius-lg);
-  --card-padding:         1.5rem;
-  --panel-radius:         var(--radius-2xl);
-  --nav-height:           4rem;
-  --container-max:        72rem; /* 1152px */
+  --font-size: 16px;
+  --background: #0a0a0c;
+  --foreground: #e8f4f3;
+  --card: #121214;
+  --card-foreground: #e8f4f3;
+  --popover: #121214;
+  --popover-foreground: #e8f4f3;
+  --primary: #a8f0ed;
+  --primary-foreground: #0a0a0c;
+  --secondary: #b897b3;
+  --secondary-foreground: #e8f4f3;
+  --muted: #1a1a1e;
+  --muted-foreground: #8a8a92;
+  --accent: #a8f0ed;
+  --accent-foreground: #0a0a0c;
+  --destructive: #d4183d;
+  --destructive-foreground: #ffffff;
+  --border: rgba(168, 240, 237, 0.15);
+  --input: rgba(168, 240, 237, 0.1);
+  --input-background: #1a1a1e;
+  --switch-background: #2a2a32;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #a8f0ed;
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.75rem;
+  --sidebar: #121214;
+  --sidebar-foreground: #e8f4f3;
+  --sidebar-primary: #a8f0ed;
+  --sidebar-primary-foreground: #0a0a0c;
+  --sidebar-accent: #1a1a1e;
+  --sidebar-accent-foreground: #e8f4f3;
+  --sidebar-border: rgba(168, 240, 237, 0.15);
+  --sidebar-ring: #a8f0ed;
 }
 
-/* ---------- TAILWIND BRIDGE: expose semantic tokens as utilities ---------- */
+.dark {
+  --background: #0a0a0c;
+  --foreground: #e8f4f3;
+  --card: #121214;
+  --card-foreground: #e8f4f3;
+  --popover: #121214;
+  --popover-foreground: #e8f4f3;
+  --primary: #a8f0ed;
+  --primary-foreground: #0a0a0c;
+  --secondary: #b897b3;
+  --secondary-foreground: #e8f4f3;
+  --muted: #1a1a1e;
+  --muted-foreground: #8a8a92;
+  --accent: #a8f0ed;
+  --accent-foreground: #0a0a0c;
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: rgba(168, 240, 237, 0.15);
+  --input: rgba(168, 240, 237, 0.1);
+  --ring: #a8f0ed;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: #121214;
+  --sidebar-foreground: #e8f4f3;
+  --sidebar-primary: #a8f0ed;
+  --sidebar-primary-foreground: #0a0a0c;
+  --sidebar-accent: #1a1a1e;
+  --sidebar-accent-foreground: #e8f4f3;
+  --sidebar-border: rgba(168, 240, 237, 0.15);
+  --sidebar-ring: #a8f0ed;
+}
+
 @theme inline {
-  /* Colors */
-  --color-surface:        var(--color-surface);
-  --color-surface-alt:    var(--color-surface-alt);
-  --color-surface-inverse:var(--color-surface-inverse);
-  --color-ink:            var(--color-ink);
-  --color-muted:          var(--color-muted);
-  --color-subtle:         var(--color-subtle);
-  --color-border:         var(--color-border);
-  --color-border-strong:  var(--color-border-strong);
-  --color-brand:          var(--color-brand);
-  --color-brand-hover:    var(--color-brand-hover);
-  --color-brand-soft:     var(--color-brand-soft);
-  --color-brand-muted:    var(--color-brand-muted);
-  --color-accent:         var(--color-accent);
-  --color-accent-hover:   var(--color-accent-hover);
-  --color-accent-soft:    var(--color-accent-soft);
-  --color-accent-muted:   var(--color-accent-muted);
-
-  /* Radii — utilities like `rounded-card`, `rounded-panel`, `rounded-pill` */
-  --radius-xs:   var(--radius-xs);
-  --radius-sm:   var(--radius-sm);
-  --radius-md:   var(--radius-md);
-  --radius-lg:   var(--radius-lg);
-  --radius-xl:   var(--radius-xl);
-  --radius-2xl:  var(--radius-2xl);
-  --radius-card: var(--card-radius);
-  --radius-panel:var(--panel-radius);
-  --radius-pill: var(--radius-pill);
-
-  /* Shadows — utilities like `shadow-soft`, `shadow-lift` */
-  --shadow-xs:   var(--shadow-xs);
-  --shadow-soft: var(--shadow-soft);
-  --shadow-lift: var(--shadow-lift);
-  --shadow-glow: var(--shadow-glow);
-
-  /* Font */
-  --font-sans: var(--font-inter);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-background: var(--input-background);
+  --color-switch-background: var(--switch-background);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* ---------- BASE ---------- */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
 
-html { scroll-behavior: smooth; }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-nunito), 'Nunito', sans-serif;
+  }
 
-body {
-  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
-  color: var(--color-ink);
-  background: var(--color-surface);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
+  html {
+    font-size: var(--font-size);
+  }
 
-/* ---------- TYPOGRAPHY UTILITIES (tokenized) ---------- */
-.t-eyebrow {
-  font-size: var(--font-size-eyebrow);
-  letter-spacing: var(--tracking-eyebrow);
-  text-transform: uppercase;
-  font-weight: 600;
-  color: var(--color-muted);
-}
-.t-display {
-  font-size: clamp(3rem, 7vw, var(--font-size-display));
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-tight);
-  font-weight: 600;
-}
-.t-h1 {
-  font-size: clamp(2.25rem, 4vw, var(--font-size-h1));
-  line-height: var(--leading-snug);
-  letter-spacing: var(--tracking-tight);
-  font-weight: 600;
-}
-.t-h2 {
-  font-size: clamp(1.75rem, 3vw, var(--font-size-h2));
-  line-height: var(--leading-snug);
-  letter-spacing: var(--tracking-tight);
-  font-weight: 600;
-}
-.t-h3 {
-  font-size: var(--font-size-h3);
-  line-height: var(--leading-snug);
-  font-weight: 600;
-}
-.t-body-lg {
-  font-size: var(--font-size-body-lg);
-  line-height: var(--leading-relaxed);
-  color: var(--color-muted);
-}
-.t-body {
-  font-size: var(--font-size-body);
-  line-height: var(--leading-normal);
-  color: var(--color-muted);
-}
-.t-body-sm {
-  font-size: var(--font-size-body-sm);
-  line-height: var(--leading-normal);
-  color: var(--color-muted);
+  h1, h2, h3, h4 {
+    font-family: var(--font-nunito), 'Nunito', sans-serif;
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  h1 { font-size: var(--text-2xl); }
+  h2 { font-size: var(--text-xl); }
+  h3 { font-size: var(--text-lg); }
+  h4 { font-size: var(--text-base); }
+
+  label, button {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+    line-height: 1.5;
+  }
+
+  input {
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-normal);
+    line-height: 1.5;
+  }
 }
 
-/* ---------- LAYOUT UTILITIES (tokenized) ---------- */
-.container-page {
-  max-width: var(--container-max);
-  margin-inline: auto;
-  padding-inline: var(--space-container-x);
-}
-.section-y {
-  padding-block: var(--space-section-y);
-}
-@media (min-width: 1024px) {
-  .section-y { padding-block: var(--space-section-y-lg); }
+/* =========================================================================
+   GLOW EFFECTS
+   ========================================================================= */
+
+.glow-button-primary {
+  position: relative;
+  background: linear-gradient(135deg, #a8f0ed 0%, #7dd3d0 100%);
+  box-shadow:
+    0 0 40px rgba(168, 240, 237, 0.4),
+    0 0 80px rgba(168, 240, 237, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
-/* ---------- SURFACE BACKGROUNDS (tokenized) ---------- */
-.bg-gradient-hero  { background: var(--gradient-hero); }
-.bg-gradient-band  { background: var(--gradient-band); }
-.bg-gradient-cta   { background: var(--gradient-cta); }
-.bg-gradient-panel { background: var(--gradient-panel); }
-.bg-gradient-brand { background: var(--gradient-brand); }
-.bg-gradient-brand-soft { background: var(--gradient-brand-soft); }
-
-.text-gradient-brand {
-  background-image: var(--gradient-brand);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.text-gradient-ink {
-  background-image: linear-gradient(120deg, var(--color-ink) 0%, var(--color-brand) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* ---------- COMPONENTS (tokenized) ---------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-weight: 500;
-  border-radius: var(--button-radius);
-  padding: var(--button-padding-y) var(--button-padding-x);
-  transition:
-    background var(--motion-base) var(--ease-out),
-    color var(--motion-base) var(--ease-out),
-    transform var(--motion-base) var(--ease-out),
-    box-shadow var(--motion-base) var(--ease-out);
-}
-.btn-primary {
-  background: var(--color-ink);
-  color: var(--color-on-inverse);
-  box-shadow: var(--shadow-xs);
-}
-.btn-primary:hover {
-  background: var(--color-brand);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-glow);
-}
-.btn-ghost {
-  color: var(--color-ink);
-  padding-inline: 1.25rem;
-}
-.btn-ghost:hover { color: var(--color-brand); }
-.btn-sm {
-  padding: 0.625rem 1.25rem;
-  font-size: var(--font-size-body-sm);
-}
-
-.card {
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--card-radius);
-  padding: var(--card-padding);
-  transition:
-    transform var(--motion-slow) var(--ease-out),
-    box-shadow var(--motion-slow) var(--ease-out),
-    border-color var(--motion-base) var(--ease-out);
-}
-.card-interactive:hover {
-  box-shadow: var(--shadow-lift);
+.glow-button-primary:hover {
+  box-shadow:
+    0 0 50px rgba(168, 240, 237, 0.6),
+    0 0 100px rgba(168, 240, 237, 0.3),
+    0 6px 16px rgba(0, 0, 0, 0.4);
   transform: translateY(-2px);
 }
 
-.panel {
-  background: var(--gradient-panel);
-  border: 1px solid var(--color-border);
-  border-radius: var(--panel-radius);
-  box-shadow: var(--shadow-lift);
+.glow-button-secondary {
+  position: relative;
+  background: linear-gradient(135deg, rgba(184, 151, 179, 0.25) 0%, rgba(184, 151, 179, 0.15) 100%);
+  border: 1px solid rgba(184, 151, 179, 0.5);
+  box-shadow:
+    0 0 35px rgba(184, 151, 179, 0.25),
+    0 0 70px rgba(184, 151, 179, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1rem;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-body-sm);
-  background: var(--color-surface-alt);
-  border: 1px solid var(--color-border);
-  transition: border-color var(--motion-base) var(--ease-out),
-              background var(--motion-base) var(--ease-out),
-              box-shadow var(--motion-base) var(--ease-out);
-}
-.chip:hover {
-  background: var(--color-surface);
-  border-color: color-mix(in srgb, var(--color-brand) 30%, transparent);
-  box-shadow: var(--shadow-soft);
+.glow-button-secondary:hover {
+  box-shadow:
+    0 0 45px rgba(184, 151, 179, 0.35),
+    0 0 90px rgba(184, 151, 179, 0.18),
+    0 6px 16px rgba(0, 0, 0, 0.4);
+  border-color: rgba(184, 151, 179, 0.7);
+  transform: translateY(-2px);
 }
 
-/* ---------- MOTION ---------- */
-@keyframes float-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+.glow-card {
+  background: linear-gradient(135deg, rgba(18, 18, 20, 0.9) 0%, rgba(26, 26, 30, 0.8) 100%);
+  border: 1px solid rgba(168, 240, 237, 0.1);
+  box-shadow: 0 0 40px rgba(168, 240, 237, 0.05);
+  transition: all 0.3s ease;
 }
-.reveal { animation: float-in var(--motion-reveal) var(--ease-out) both; }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; }
-  html { scroll-behavior: auto; }
+.glow-card:hover {
+  border-color: rgba(168, 240, 237, 0.2);
+  box-shadow:
+    0 0 50px rgba(168, 240, 237, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.4);
+  transform: translateY(-4px);
+}
+
+.gradient-section {
+  background: linear-gradient(180deg, rgba(26, 26, 30, 0.4) 0%, rgba(10, 10, 12, 0) 100%);
+}
+
+.neon-text {
+  text-shadow:
+    0 0 20px rgba(168, 240, 237, 0.5),
+    0 0 40px rgba(168, 240, 237, 0.3);
+}
+
+.subtle-glow {
+  box-shadow: 0 0 60px rgba(168, 240, 237, 0.08);
 }
