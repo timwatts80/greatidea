@@ -398,7 +398,7 @@ export default function Home() {
             </h2>
             <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
               Search is shifting from blue links to direct answers. We optimize your brand
-              to be the source ChatGPT, Perplexity, Claude, and Google AI Overviews cite—
+              to be the source Claude, ChatGPT, Perplexity, and Google AI Overviews cite—
               so you win the customer before they ever reach a results page.
             </p>
           </div>
@@ -440,7 +440,7 @@ export default function Home() {
                 icon: Bot,
                 title: "LLM Visibility Audits",
                 description:
-                  "See exactly how ChatGPT, Perplexity, Claude, and Gemini describe your brand today—and where competitors are winning the answer.",
+                  "See exactly how Claude, ChatGPT, Perplexity, and Gemini describe your brand today—and where competitors are winning the answer.",
               },
               {
                 icon: Target,
