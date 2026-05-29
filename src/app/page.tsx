@@ -17,11 +17,18 @@ import {
   Mail,
   Send,
   Loader2,
+  Search,
+  MessageSquareText,
+  TrendingUp,
+  Bot,
+  Target,
+  Quote,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Turnstile } from "@marsidev/react-turnstile";
 import { AdminCard } from "@/components/AdminCard";
+import BookingModal from "@/components/BookingModal";
 
 const TURNSTILE_SITE_KEY =
   process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA";
@@ -30,6 +37,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentPhrase, setCurrentPhrase] = useState(0);
   const [isAdminMode, setIsAdminMode] = useState(false);
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   const phrases = [
     { line1: "Transform Your", line2: "Digital Vision" },
@@ -38,7 +46,7 @@ export default function Home() {
   ];
 
   const [subheader, setSubheader] = useState(
-    "Custom AI solutions powered by Claude for creative projects, business workflows, and digital innovation. From intelligent automation to cutting-edge interactive experiences."
+    "Custom AI solutions for creative projects, business workflows, and digital innovation. From intelligent automation to cutting-edge interactive experiences."
   );
 
   // Contact form state
@@ -180,6 +188,7 @@ export default function Home() {
 
             <div className="hidden md:flex items-center gap-8">
               <a href="#solutions" className="text-foreground/80 hover:text-primary transition-colors">Solutions</a>
+              <a href="#aeo" className="text-foreground/80 hover:text-primary transition-colors">AEO</a>
               <a href="#use-cases" className="text-foreground/80 hover:text-primary transition-colors">Use Cases</a>
               <a href="#learning" className="text-foreground/80 hover:text-primary transition-colors">Learning</a>
               <a href="#contact" className="text-foreground/80 hover:text-primary transition-colors">Contact</a>
@@ -202,6 +211,7 @@ export default function Home() {
           <div className="md:hidden bg-card/95 backdrop-blur-xl border-t border-border">
             <div className="px-4 py-6 space-y-4">
               <a href="#solutions" className="block text-foreground/80 hover:text-primary transition-colors py-2">Solutions</a>
+              <a href="#aeo" className="block text-foreground/80 hover:text-primary transition-colors py-2">AEO</a>
               <a href="#use-cases" className="block text-foreground/80 hover:text-primary transition-colors py-2">Use Cases</a>
               <a href="#learning" className="block text-foreground/80 hover:text-primary transition-colors py-2">Learning</a>
               <a href="#contact" className="block text-foreground/80 hover:text-primary transition-colors py-2">Contact</a>
@@ -219,7 +229,7 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 mb-8 subtle-glow">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm text-foreground/90">Powered by Claude AI</span>
+              <span className="text-sm text-foreground/90">Powered by Advanced AI</span>
             </div>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl mb-6 tracking-tight font-bold leading-none">
@@ -267,12 +277,12 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a href="#contact" className="glow-button-primary px-8 py-4 rounded-xl text-primary-foreground w-full sm:w-auto flex items-center justify-center gap-2">
+              <a href="#contact" className="glow-button-primary px-8 py-4 rounded-xl text-primary-foreground w-full sm:w-auto text-center">
                 Start Your Project
-                <ArrowRight className="w-5 h-5" />
               </a>
-              <a href="#use-cases" className="glow-button-secondary px-8 py-4 rounded-xl text-foreground w-full sm:w-auto text-center">
-                View Examples
+              <a href="#aeo" className="glow-button-secondary px-8 py-4 rounded-xl text-foreground w-full sm:w-auto flex items-center justify-center gap-2">
+                Win at AEO/SEO
+                <ArrowRight className="w-5 h-5" />
               </a>
             </div>
           </div>
@@ -282,7 +292,7 @@ export default function Home() {
         <div className="absolute bottom-1/4 right-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl opacity-20 pointer-events-none" />
       </section>
 
-      {/* Claude Highlight */}
+      {/* AI Highlight */}
       <section className="relative py-20 md:py-32 px-4 sm:px-6 lg:px-8">
         <div className="absolute inset-0 bg-gradient-to-b from-muted/30 to-background" />
         <div
@@ -298,30 +308,21 @@ export default function Home() {
               <div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 mb-6 subtle-glow">
                   <Cpu className="w-4 h-4 text-primary" />
-                  <span className="text-sm text-foreground/90">Anthropic&apos;s Claude</span>
+                  <span className="text-sm text-foreground/90">Best-in-Class AI</span>
                 </div>
                 <h2 className="text-3xl md:text-4xl mb-6">
-                  Built on <span className="text-primary neon-text">Claude</span>
+                  Built on the <span className="text-primary neon-text">Best AI</span> for the Job
                 </h2>
                 <p className="text-foreground/70 text-lg mb-6 leading-relaxed">
-                  We leverage Claude by Anthropic—one of the most advanced AI systems
-                  available—to power intelligent, context-aware solutions that understand
-                  nuance and deliver exceptional results.
+                  We work with the most capable AI systems available—from Anthropic&apos;s Claude
+                  to OpenAI and beyond—and choose the right model for each problem, rather than
+                  forcing every job through one tool.
                 </p>
                 <p className="text-foreground/60 leading-relaxed mb-8">
-                  Whether it&apos;s automating complex workflows, generating creative content,
-                  or building sophisticated tools, Claude&apos;s capabilities enable us to create
-                  solutions that truly understand and adapt to your needs.
+                  Whether it&apos;s automating complex workflows, generating creative content, or
+                  building sophisticated tools, we pair the strongest model with thoughtful
+                  engineering to deliver solutions that truly understand and adapt to your needs.
                 </p>
-                <a
-                  href="https://claude.ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
-                >
-                  <span>Learn more about Claude</span>
-                  <ArrowRight className="w-4 h-4" />
-                </a>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {[
@@ -349,7 +350,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl mb-4">
-              <span className="text-primary neon-text">Claude-Powered</span> Solutions
+              <span className="text-primary neon-text">AI-Powered</span> Solutions
             </h2>
             <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
               Intelligent capabilities tailored to your unique needs
@@ -358,9 +359,9 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {[
-              { icon: Cpu, title: "Claude-Powered Automation", description: "Streamline workflows with intelligent automation that understands context and adapts to your processes." },
+              { icon: Cpu, title: "AI-Powered Automation", description: "Streamline workflows with intelligent automation that understands context and adapts to your processes." },
               { icon: Code2, title: "Custom Tools", description: "Bespoke applications and integrations built to solve your specific challenges." },
-              { icon: Sparkles, title: "Creative AI with Claude", description: "Generate sophisticated content, design assets, and interactive experiences with Claude's advanced language capabilities." },
+              { icon: Sparkles, title: "Creative AI", description: "Generate sophisticated content, design assets, and interactive experiences with advanced language and image models." },
               { icon: Zap, title: "Smart Analytics", description: "Transform data into actionable insights with AI-powered analysis and visualization." },
               { icon: Rocket, title: "Rapid Prototyping", description: "Go from concept to working prototype in days, not months, with AI-accelerated development." },
               { icon: Lightbulb, title: "Innovation Lab", description: "Explore cutting-edge AI capabilities for games, apps, and experimental projects." },
@@ -373,6 +374,111 @@ export default function Home() {
                 <p className="text-foreground/70 leading-relaxed">{solution.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AEO — Answer Engine Optimization */}
+      <section id="aeo" className="relative py-20 md:py-32 px-4 sm:px-6 lg:px-8">
+        <div
+          className="absolute inset-0 opacity-[0.07] pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 140% 120% at 100% 0%, #b897b3 0%, transparent 55%)",
+          }}
+        />
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 mb-6 subtle-glow">
+              <Search className="w-4 h-4 text-primary" />
+              <span className="text-sm text-foreground/90">Answer Engine Optimization</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl mb-4">
+              Get Found by <span className="text-primary neon-text">AI Answer Engines</span>
+            </h2>
+            <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
+              Search is shifting from blue links to direct answers. We optimize your brand
+              to be the source ChatGPT, Perplexity, Claude, and Google AI Overviews cite—
+              so you win the customer before they ever reach a results page.
+            </p>
+          </div>
+
+          {/* Stat callout */}
+          <div className="glow-card p-8 md:p-12 rounded-3xl mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+              {[
+                { stat: "60%+", label: "of searches now end without a click to a website" },
+                { stat: "1 answer", label: "is what AI engines surface—being it is everything" },
+                { stat: "Always-on", label: "monitoring as models and citations change weekly" },
+              ].map((item, i) => (
+                <div key={i}>
+                  <div className="text-4xl md:text-5xl font-bold text-primary neon-text mb-2">
+                    {item.stat}
+                  </div>
+                  <p className="text-foreground/60 leading-relaxed">{item.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* What we do */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {[
+              {
+                icon: MessageSquareText,
+                title: "Conversational Content",
+                description:
+                  "Restructure your messaging into the question-and-answer formats that LLMs parse, trust, and quote verbatim.",
+              },
+              {
+                icon: Quote,
+                title: "Citation Engineering",
+                description:
+                  "Build the authoritative, well-sourced pages and schema markup that make your business the reference answer engines pull from.",
+              },
+              {
+                icon: Bot,
+                title: "LLM Visibility Audits",
+                description:
+                  "See exactly how ChatGPT, Perplexity, Claude, and Gemini describe your brand today—and where competitors are winning the answer.",
+              },
+              {
+                icon: Target,
+                title: "Entity & Brand Authority",
+                description:
+                  "Strengthen your knowledge-graph footprint so AI consistently associates your name with the services you want to be known for.",
+              },
+              {
+                icon: TrendingUp,
+                title: "Answer Share Tracking",
+                description:
+                  "Measure how often you're cited across answer engines over time and tie it back to real pipeline and revenue.",
+              },
+              {
+                icon: Sparkles,
+                title: "AI-Powered Optimization",
+                description:
+                  "We use advanced AI to model how answer engines interpret your content and generate the precise updates that earn more citations.",
+              },
+            ].map((feature, index) => (
+              <div key={index} className="glow-card p-6 md:p-8 rounded-2xl">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-4 subtle-glow">
+                  <feature.icon className="w-6 h-6 text-primary" strokeWidth={2} />
+                </div>
+                <h3 className="text-xl mb-3">{feature.title}</h3>
+                <p className="text-foreground/70 leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <a
+              href="#contact"
+              className="glow-button-primary inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl text-primary-foreground"
+            >
+              Audit My AI Visibility
+              <ArrowRight className="w-5 h-5" />
+            </a>
           </div>
         </div>
       </section>
@@ -449,13 +555,13 @@ export default function Home() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 mb-6 subtle-glow">
               <GraduationCap className="w-4 h-4 text-primary" />
-              <span className="text-sm text-foreground/90">Claude AI Education &amp; Training</span>
+              <span className="text-sm text-foreground/90">AI Education &amp; Training</span>
             </div>
             <h2 className="text-3xl md:text-5xl mb-4">
-              Master <span className="text-primary neon-text">Claude &amp; AI</span> for Your Future
+              Master <span className="text-primary neon-text">AI</span> for Your Future
             </h2>
             <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
-              Comprehensive education on Claude and modern AI—from fundamentals to advanced implementation
+              Comprehensive education on modern AI—from fundamentals to advanced implementation
             </p>
           </div>
 
@@ -463,15 +569,15 @@ export default function Home() {
             {[
               {
                 icon: BookOpen,
-                title: "Claude & AI Fundamentals",
-                description: "Understand Claude's capabilities and core concepts of modern AI systems.",
-                topics: ["Claude.ai Overview", "LLMs & Generative AI", "Prompt Engineering", "AI Ethics & Safety"],
+                title: "AI Fundamentals",
+                description: "Understand the capabilities and core concepts behind today's leading AI systems.",
+                topics: ["The LLM Landscape", "LLMs & Generative AI", "Prompt Engineering", "AI Ethics & Safety"],
               },
               {
                 icon: Code2,
                 title: "Practical Implementation",
-                description: "Learn to integrate Claude into your workflows and build custom solutions.",
-                topics: ["Claude API Integration", "Automation Workflows", "Custom Tools with Claude", "Best Practices"],
+                description: "Learn to integrate AI into your workflows and build custom solutions.",
+                topics: ["AI API Integration", "Automation Workflows", "Custom AI Tools", "Best Practices"],
               },
               {
                 icon: Rocket,
@@ -521,9 +627,13 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
-              <a href="#contact" className="glow-button-secondary px-6 py-3 rounded-lg text-foreground w-full text-center block">
+              <button
+                type="button"
+                onClick={() => setBookingOpen(true)}
+                className="glow-button-secondary px-6 py-3 rounded-lg text-foreground w-full text-center block"
+              >
                 Book a Workshop
-              </a>
+              </button>
             </div>
 
             <div className="glow-card p-8 rounded-2xl">
@@ -567,16 +677,20 @@ export default function Home() {
               Ready to Build Something <span className="text-primary neon-text">Great</span>?
             </h2>
             <p className="text-foreground/70 text-lg mb-10 max-w-2xl mx-auto">
-              Let&apos;s turn your ideas into reality with custom Claude-powered AI solutions designed for your unique needs.
+              Let&apos;s turn your ideas into reality with custom AI solutions designed for your unique needs.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a href="#contact" className="glow-button-primary px-8 py-4 rounded-xl text-primary-foreground w-full sm:w-auto flex items-center justify-center gap-2">
                 Start a Project
                 <ArrowRight className="w-5 h-5" />
               </a>
-              <a href="#contact" className="glow-button-secondary px-8 py-4 rounded-xl text-foreground w-full sm:w-auto text-center">
+              <button
+                type="button"
+                onClick={() => setBookingOpen(true)}
+                className="glow-button-secondary px-8 py-4 rounded-xl text-foreground w-full sm:w-auto text-center"
+              >
                 Schedule a Call
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -588,13 +702,14 @@ export default function Home() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 mb-6 subtle-glow">
               <Mail className="w-4 h-4 text-primary" />
-              <span className="text-sm text-foreground/90">Get in Touch</span>
+              <span className="text-sm text-foreground/90">Let&apos;s Talk</span>
             </div>
             <h2 className="text-3xl md:text-5xl mb-4">
-              Let&apos;s <span className="text-primary neon-text">Connect</span>
+              Let&apos;s Make Something <span className="text-primary neon-text">Together</span>
             </h2>
             <p className="text-foreground/70 text-lg max-w-2xl mx-auto">
-              Ready to bring your ideas to life? Fill out the form below and we&apos;ll get back to you soon.
+              Tell me what you&apos;re dreaming up. The best work starts as a conversation, not a
+              contract—so let&apos;s just talk it through.
             </p>
           </div>
 
@@ -744,11 +859,13 @@ export default function Home() {
               </span>
             </div>
             <p className="text-sm text-foreground/60">
-              © 2026 great idea cs. Claude-powered solutions for the digital age.
+              © 2026 great idea cs. AI-powered solutions for the digital age.
             </p>
           </div>
         </div>
       </footer>
+
+      <BookingModal open={bookingOpen} onClose={() => setBookingOpen(false)} />
 
       {isAdminMode && <AdminCard />}
     </div>
