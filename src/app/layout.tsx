@@ -1,51 +1,46 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Nunito } from "next/font/google";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
+import ClarityAnalytics from "@/components/ClarityAnalytics";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+const GA_IDS = ["G-HK9W7EMRCV", "G-670SMPG4DV"];
 
 export const metadata: Metadata = {
   title: "Great Idea CS — Bring your vision to life",
   description:
-    "Great Idea Creative Services builds modern websites, apps, design systems, and the quiet automation that runs your business. Built with craft. Accelerated by AI.",
+    "Custom AI solutions powered by Claude for creative projects, business workflows, and digital innovation.",
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased`}>
+    <html lang="en" className="dark">
+      <body className={`${nunito.variable} antialiased`}>
         {children}
         <Analytics />
-        {GA_ID && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-              strategy="afterInteractive"
-            />
-            <Script id="gtag-init" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${GA_ID}', {
-                  linker: {
-                    domains: ['greatidea-cs.com', 'api.greatidea-cs.com']
-                  }
-                });
-              `}
-            </Script>
-          </>
-        )}
+        <ClarityAnalytics />
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_IDS[0]}`}
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            ${GA_IDS.map(id => `gtag('config', '${id}', { linker: { domains: ['greatidea-cs.com', 'api.greatidea-cs.com'] } });`).join('\n            ')}
+          `}
+        </Script>
       </body>
     </html>
   );
