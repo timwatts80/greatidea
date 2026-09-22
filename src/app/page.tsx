@@ -15,8 +15,6 @@ import {
   Users,
   Trophy,
   Mail,
-  Send,
-  Loader2,
   Search,
   MessageSquareText,
   TrendingUp,
@@ -26,13 +24,10 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Turnstile } from "@marsidev/react-turnstile";
 import { AdminCard } from "@/components/AdminCard";
 import BookingModal from "@/components/BookingModal";
+import IdeaIntake from "@/components/IdeaIntake";
 import Testimonials from "@/components/Testimonials";
-
-const TURNSTILE_SITE_KEY =
-  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA";
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -49,19 +44,6 @@ export default function Home() {
   const [subheader, setSubheader] = useState(
     "Custom AI solutions for creative projects, business workflows, and digital innovation. From intelligent automation to cutting-edge interactive experiences."
   );
-
-  // Contact form state
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    business_type: "",
-    message: "",
-  });
-  const [turnstileToken, setTurnstileToken] = useState("");
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState("");
 
   // Detect admin mode on client
   useEffect(() => {
@@ -103,73 +85,6 @@ export default function Home() {
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleFormChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    if (formErrors[e.target.name]) {
-      setFormErrors((prev) => {
-        const next = { ...prev };
-        delete next[e.target.name];
-        return next;
-      });
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormErrors({});
-    setSubmitError("");
-
-    if (!turnstileToken) {
-      setSubmitError("Please complete the spam check.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const payload: Record<string, string> = {
-        name: formData.name,
-        email: formData.email,
-        turnstile_token: turnstileToken,
-      };
-      if (formData.business_type) payload.business_type = formData.business_type;
-      if (formData.message) payload.message = formData.message;
-
-      const response = await fetch("https://api.greatidea-cs.com/v1/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.ok) {
-        setSubmitSuccess(true);
-      } else if (response.status === 400 && data.errors) {
-        setFormErrors(data.errors);
-      } else if (response.status === 400 && data.error === "spam_check_failed") {
-        setSubmitError("Please complete the spam check and try again.");
-        setTurnstileToken("");
-      } else if (response.status === 429) {
-        setSubmitError("Too many submissions. Please wait a few minutes.");
-      } else {
-        setSubmitError(
-          "Something went wrong. Please email hello@greatidea-cs.com directly."
-        );
-      }
-    } catch {
-      setSubmitError(
-        "Something went wrong. Please email hello@greatidea-cs.com directly."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -304,7 +219,7 @@ export default function Home() {
           }}
         />
         <div className="max-w-6xl mx-auto relative z-10">
-          <div className="glow-card p-8 md:p-12 lg:p-16 rounded-3xl">
+          <div className="glow-card p-6 sm:p-8 md:p-12 lg:p-16 rounded-3xl">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 mb-6 subtle-glow">
@@ -673,7 +588,7 @@ export default function Home() {
       {/* CTA */}
       <section className="py-20 md:py-32 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="glow-card p-10 md:p-16 rounded-3xl text-center">
+          <div className="glow-card p-6 sm:p-10 md:p-16 rounded-3xl text-center">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mx-auto mb-6 subtle-glow">
               <Lightbulb className="w-8 h-8 text-primary" strokeWidth={2.5} />
             </div>
@@ -717,135 +632,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="glow-card p-8 md:p-12 rounded-2xl">
-            {submitSuccess ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
-                  <Send className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-2xl mb-3">Thanks for reaching out!</h3>
-                <p className="text-foreground/70">We&apos;ll be in touch within one business day.</p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm text-foreground/80 mb-2">
-                    Name <span className="text-destructive">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleFormChange}
-                    required
-                    className={`w-full px-4 py-3 rounded-lg bg-input-background border ${
-                      formErrors.name ? "border-destructive" : "border-border"
-                    } text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
-                    placeholder="Your name"
-                  />
-                  {formErrors.name && <p className="text-destructive text-sm mt-1">{formErrors.name}</p>}
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-sm text-foreground/80 mb-2">
-                    Email <span className="text-destructive">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleFormChange}
-                    required
-                    className={`w-full px-4 py-3 rounded-lg bg-input-background border ${
-                      formErrors.email ? "border-destructive" : "border-border"
-                    } text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
-                    placeholder="your@email.com"
-                  />
-                  {formErrors.email && <p className="text-destructive text-sm mt-1">{formErrors.email}</p>}
-                </div>
-
-                <div>
-                  <label htmlFor="business_type" className="block text-sm text-foreground/80 mb-2">
-                    Type of Business
-                  </label>
-                  <select
-                    id="business_type"
-                    name="business_type"
-                    value={formData.business_type}
-                    onChange={handleFormChange}
-                    className={`w-full px-4 py-3 rounded-lg bg-input-background border ${
-                      formErrors.business_type ? "border-destructive" : "border-border"
-                    } text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all`}
-                  >
-                    <option value="">Select...</option>
-                    <option value="Real estate">Real estate</option>
-                    <option value="Coach">Coach</option>
-                    <option value="Fitness">Fitness</option>
-                    <option value="Creator">Creator</option>
-                    <option value="Other">Other</option>
-                  </select>
-                  {formErrors.business_type && (
-                    <p className="text-destructive text-sm mt-1">{formErrors.business_type}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm text-foreground/80 mb-2">
-                    Message
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleFormChange}
-                    rows={6}
-                    maxLength={2000}
-                    className={`w-full px-4 py-3 rounded-lg bg-input-background border ${
-                      formErrors.message ? "border-destructive" : "border-border"
-                    } text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none`}
-                    placeholder="Tell us about your project..."
-                  />
-                  {formErrors.message && <p className="text-destructive text-sm mt-1">{formErrors.message}</p>}
-                </div>
-
-                <div>
-                  <Turnstile
-                    siteKey={TURNSTILE_SITE_KEY}
-                    onSuccess={(token) => setTurnstileToken(token)}
-                    onError={() => setTurnstileToken("")}
-                    onExpire={() => setTurnstileToken("")}
-                    options={{ theme: "dark" }}
-                  />
-                </div>
-
-                {submitError && (
-                  <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20">
-                    <p className="text-destructive text-sm">{submitError}</p>
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="glow-button-primary w-full px-8 py-4 rounded-xl text-primary-foreground flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      Send Message
-                      <Send className="w-5 h-5" />
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
-          </div>
+          <IdeaIntake />
         </div>
       </section>
 

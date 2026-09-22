@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1",
     "@marsidev/react-turnstile": "^1.5.2",
     "@microsoft/clarity": "^1.0.2",
     "@notionhq/client": "^5.22.0",

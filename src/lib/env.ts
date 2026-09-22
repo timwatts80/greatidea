@@ -22,6 +22,9 @@ export const env = {
   // Spam
   get TURNSTILE_SECRET() { return required("TURNSTILE_SECRET"); },
 
+  // AI (guided idea intake)
+  get ANTHROPIC_API_KEY() { return required("ANTHROPIC_API_KEY"); },
+
   // Storage (Vercel KV / Upstash)
   get KV_REST_API_URL() { return required("KV_REST_API_URL"); },
   get KV_REST_API_TOKEN() { return required("KV_REST_API_TOKEN"); },

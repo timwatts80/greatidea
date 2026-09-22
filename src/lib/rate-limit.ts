@@ -19,6 +19,25 @@ export function contactLimiter() {
   return _contactLimiter;
 }
 
+/**
+ * Limiter for the guided idea-intake endpoint. Each visitor makes several
+ * calls per conversation (one per beat), so the window is more generous
+ * than the contact form's.
+ */
+let _intakeLimiter: Ratelimit | null = null;
+
+export function intakeLimiter() {
+  if (!_intakeLimiter) {
+    _intakeLimiter = new Ratelimit({
+      redis: kv(),
+      limiter: Ratelimit.slidingWindow(90, "10 m"),
+      analytics: true,
+      prefix: "rl:intake",
+    });
+  }
+  return _intakeLimiter;
+}
+
 /** Extract a stable client identifier from the request. Prefers CF/Vercel headers. */
 export function clientId(req: Request): string {
   return (
