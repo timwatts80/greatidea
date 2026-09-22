@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7CF5DD"/>
+      <stop offset="100%" stop-color="#3EDBC2"/>
+    </linearGradient>
+    <radialGradient id="bgGlow" cx="35%" cy="25%" r="65%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="bulbShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14"/>
+      <feOffset dx="0" dy="10"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.18"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background: brand mint with subtle gradient and top-left highlight -->
+  <rect width="1024" height="1024" rx="220" ry="220" fill="url(#bg)"/>
+  <rect width="1024" height="1024" rx="220" ry="220" fill="url(#bgGlow)"/>
+
+  <!-- Lightbulb mark, centered. White with soft shadow for depth -->
+  <g filter="url(#bulbShadow)" fill="#ffffff">
+    <!-- Bulb body: rounded dome with base -->
+    <path d="
+      M 512 200
+      C 379 200 272 305 272 436
+      C 272 514 308 583 360 627
+      L 360 692
+      C 360 712 376 728 396 728
+      L 628 728
+      C 648 728 664 712 664 692
+      L 664 627
+      C 716 583 752 514 752 436
+      C 752 305 645 200 512 200
+      Z
+    "/>
+    <!-- Filament shape inside bulb (subtle, lighter mint) -->
+    <path d="
+      M 460 410
+      L 460 540
+      L 484 540
+      L 484 470
+      L 540 470
+      L 540 540
+      L 564 540
+      L 564 410
+      L 540 410
+      L 540 446
+      L 484 446
+      L 484 410
+      Z
+    " fill="#7CF5DD" opacity="0.55"/>
+    <!-- Screw base / cap rings -->
+    <rect x="396" y="752" width="232" height="28" rx="14" ry="14"/>
+    <rect x="412" y="800" width="200" height="24" rx="12" ry="12"/>
+    <!-- Bottom contact -->
+    <path d="
+      M 472 840
+      L 552 840
+      C 564 840 572 850 572 862
+      C 572 884 552 904 512 904
+      C 472 904 452 884 452 862
+      C 452 850 460 840 472 840
+      Z
+    "/>
+  </g>
+</svg>
