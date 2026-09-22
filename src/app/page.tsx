@@ -116,11 +116,12 @@ export default function Home() {
               </span>
             </Link>
 
-            <div className="hidden md:flex items-center gap-8">
+            <div className="hidden lg:flex items-center gap-8 whitespace-nowrap">
               <a href="#solutions" className="text-foreground/80 hover:text-primary transition-colors">Solutions</a>
               <a href="#aeo" className="text-foreground/80 hover:text-primary transition-colors">AEO</a>
               <a href="#use-cases" className="text-foreground/80 hover:text-primary transition-colors">Use Cases</a>
               <a href="#learning" className="text-foreground/80 hover:text-primary transition-colors">Learning</a>
+              <a href="#clients" className="text-foreground/80 hover:text-primary transition-colors">Client Stories</a>
               <a href="#contact" className="text-foreground/80 hover:text-primary transition-colors">Contact</a>
               <a href="#contact" className="glow-button-primary px-6 py-2.5 rounded-lg text-sm text-primary-foreground">
                 Get Started
@@ -129,7 +130,7 @@ export default function Home() {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-foreground hover:text-primary transition-colors"
+              className="lg:hidden p-2 text-foreground hover:text-primary transition-colors"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -138,12 +139,18 @@ export default function Home() {
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden bg-card/95 backdrop-blur-xl border-t border-border">
-            <div className="px-4 py-6 space-y-4">
+          <div className="lg:hidden bg-card/95 backdrop-blur-xl border-t border-border">
+            <div
+              className="px-4 py-6 space-y-4"
+              onClick={(e) => {
+                if ((e.target as HTMLElement).closest("a")) setMobileMenuOpen(false);
+              }}
+            >
               <a href="#solutions" className="block text-foreground/80 hover:text-primary transition-colors py-2">Solutions</a>
               <a href="#aeo" className="block text-foreground/80 hover:text-primary transition-colors py-2">AEO</a>
               <a href="#use-cases" className="block text-foreground/80 hover:text-primary transition-colors py-2">Use Cases</a>
               <a href="#learning" className="block text-foreground/80 hover:text-primary transition-colors py-2">Learning</a>
+              <a href="#clients" className="block text-foreground/80 hover:text-primary transition-colors py-2">Client Stories</a>
               <a href="#contact" className="block text-foreground/80 hover:text-primary transition-colors py-2">Contact</a>
               <a href="#contact" className="glow-button-primary w-full px-6 py-3 rounded-lg text-sm text-primary-foreground mt-4 block text-center">
                 Get Started

@@ -159,6 +159,13 @@
   }
 }
 
+/* Smooth-scroll in-page anchor links (nav, CTAs), unless the user prefers reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 /* =========================================================================
    GLOW EFFECTS
    ========================================================================= */
