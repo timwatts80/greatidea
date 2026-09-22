@@ -29,6 +29,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Turnstile } from "@marsidev/react-turnstile";
 import { AdminCard } from "@/components/AdminCard";
 import BookingModal from "@/components/BookingModal";
+import Testimonials from "@/components/Testimonials";
 
 const TURNSTILE_SITE_KEY =
   process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "1x00000000000000000000AA";
@@ -665,6 +666,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Client testimonials */}
+      <Testimonials />
 
       {/* CTA */}
       <section className="py-20 md:py-32 px-4 sm:px-6 lg:px-8">
