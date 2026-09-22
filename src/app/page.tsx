@@ -23,6 +23,7 @@ import {
   Quote,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { AdminCard } from "@/components/AdminCard";
 import BookingModal from "@/components/BookingModal";
@@ -92,7 +93,20 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
-            <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              aria-label="Great Idea CS home"
+              onClick={(e) => {
+                // Already on the homepage: scroll to top and drop any #section hash
+                if (window.location.pathname === "/") {
+                  e.preventDefault();
+                  window.history.replaceState(null, "", "/");
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                  setMobileMenuOpen(false);
+                }
+              }}
+              className="flex items-center gap-3"
+            >
               <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 subtle-glow">
                 <Lightbulb className="w-6 h-6 md:w-7 md:h-7 text-primary" strokeWidth={2.5} />
               </div>
@@ -100,7 +114,7 @@ export default function Home() {
                 <span className="text-primary neon-text">great idea</span>
                 <span className="text-muted-foreground"> cs</span>
               </span>
-            </div>
+            </Link>
 
             <div className="hidden md:flex items-center gap-8">
               <a href="#solutions" className="text-foreground/80 hover:text-primary transition-colors">Solutions</a>
